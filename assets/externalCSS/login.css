@@ -1,0 +1,168 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fjalla+One&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Special+Gothic+Expanded+One&display=swap');:root{
+    --mossgreen: #2e4b1b;
+	--green: #67AE6E;
+	--light-green: #a8cd89;
+    --grey:  rgb(228, 228, 228);
+    --dark-green:#0A400C;
+}
+.col2{
+    background-color: var(--green);
+}
+/* .card-inner-left{
+    height: 100vh;
+    border-bottom-left-radius: 30%;
+    border-top-right-radius: 40%;
+    border-bottom-right-radius: 50%;
+    border-top-left-radius: 0%;
+    border: none;
+    background: linear-gradient(153deg,rgba(103, 174, 110, 1) 55%, rgba(202, 232, 189, 1) 100%);
+} */
+.input-group{
+    width: 350px;
+    margin: auto;
+}
+.card-left {
+    height: 100vh;
+    border-bottom-left-radius: 30%;
+    border-top-right-radius: 40%;
+    border-bottom-right-radius: 0%;
+    border-top-left-radius: 0%;
+    border: none;
+    background-color: var(--green);
+}
+.card-right{
+    height: 100vh;
+    border-bottom-left-radius: 30%;
+    border-top-right-radius: 40%;
+    border-bottom-right-radius: 0%;
+    border-top-left-radius: 0%;
+    border: none;
+}
+.imglogo1{
+    height: 130px;
+    width: 130px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 0;
+}
+.imglogo{
+    height: 100px;
+    width: 100px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 0;
+}
+.toggle-icon {
+    position: absolute;
+    right: 90px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+.header-text{
+    font-family: "Special Gothic Expanded One", sans-serif;
+    font-size: 40px;
+    font-weight: 500;
+    padding-top: 20px;
+    color: black;
+}
+.header-login{
+    font-family: "Special Gothic Expanded One", sans-serif;
+    font-size: 30px;
+    font-weight: 500;
+    color: black;
+    padding: 0;
+    margin: 0;
+}
+.login-text{
+    font-family: "Sansation", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    font-style: italic;
+    margin: 0 0 10 0;
+    padding: 0;
+
+}
+.signup-text{
+    font-family: "Sansation", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    width: 80%;
+    margin: auto;
+
+}
+/* .register-text{
+    font-family: "Sansation", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    width: 90%;
+
+} */
+.register-text{
+    font-family: "Sansation", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    padding-top: 30px;
+
+}
+.row1{
+    height: 55vh;
+}
+
+
+.register-account-button {
+    background-image: linear-gradient(to right, #67AE6E 0%, #0A400C  51%, #67AE6E  100%);
+}
+.register-account-button {
+    border-radius: 20%;
+    border: none;
+    font-family: "Special Gothic Expanded One", sans-serif;
+    padding: 10px 20px;
+    margin: 10px 0;
+    border-radius: 30px;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    width: 200px;
+    background-size: 200% auto;
+    color: white;            
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.register-account-button:hover {
+    background-position: right center; /* change the direction of the change here */
+    
+    color: white;
+    text-decoration: none;
+}
+         
+.register-but {
+    display: inline-block;
+    background-color: #000000;
+    color: #ffffff;
+    padding: 5px 30px;
+    margin: 10px 0;
+    border-radius: 30px;
+    text-decoration: none;
+    width: 150px;
+    text-align: center;
+    font-family: "Special Gothic Expanded One", sans-serif;
+}
+.forgot{
+    margin-left: 60px;
+}
+.register-but:hover {
+    background-position: right center; /* change the direction of the change here */
+    
+    color:  var(--dark-green);
+    text-decoration: none;
+}
+         
+  @keyframes slidebg {
+    to {
+      background-position:20vw;
+    }
+  }
+  

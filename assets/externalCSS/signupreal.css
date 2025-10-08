@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Special+Gothic+Expanded+One&display=swap');
+:root{
+    --mossgreen: #2e4b1b;
+	--green: #355f2e;
+	--light-green: #a8cd89;
+    --grey:  rgb(228, 228, 228);
+}
+body {
+    background-image: url(../../img/logo/bglog.png);
+    height: 100vh;
+    /*display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto; */
+    font-family: Arial, sans-serif;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+::-webkit-inner-spin-button, 
+::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.card-outer{
+    background-color: var(--grey);
+    border-radius: 20px;
+}
+.card-wrapper {
+    display: inline-block;
+}
+  
+.card-inner{
+    background-color: var(--green);
+    border-start-start-radius: 15px;
+    border-start-end-radius: 15px;
+    border-end-start-radius: 15px;
+    border-end-end-radius: 0;
+    transition: border-radius 0.1s ease;
+}
+a{
+    text-decoration: none;
+}
+
+.login-text {
+    font-size: 15px;
+    font-weight: bold;
+    background: var(--grey);
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+    border-end-start-radius: 15px;
+    border-end-end-radius: 15px;
+    width: 87%;
+
+    transition: .3s;
+    color: black;
+}
+.login-text:hover {
+    background: var(--green);
+    width: 87%;
+
+    color: white;
+} 
+.card-wrapper:has(.login-text:hover) .card-inner{
+    border-end-start-radius: 0;
+}
+
+.signup-text {
+    font-size: 15px;
+    font-weight: bold;
+    background: var(--green);
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+    border-end-start-radius: 15px;
+    border-end-end-radius: 15px;
+    width: 87%;
+
+    color: white;
+
+} 
+.inputradius{
+    border-radius: 50px;
+}
+.forgotpass{
+    font-size: 12px;
+    text-decoration:underline;
+    font-family: "Sansation", sans-serif;
+    font-weight: 400;
+
+}
+.btn{
+    border-radius: 50px;
+    background-color: var(--grey    );
+    font-family: "Special Gothic Expanded One", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    color: var(--mossgreen);
+    
+    background-image: linear-gradient(to right, #1D976C 0%, #93F9B9  51%, #1D976C  100%);
+    
+    margin: 10px;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;            
+    box-shadow: 0 0 20px #eee;
+    display: block;
+
+    
+}
+.btn:hover {
+    background-position: right center; /* change the direction of the change here */
+    color: #fff;
+    text-decoration: none;
+}
+.starttitle{
+    font-family: "Special Gothic Expanded One", sans-serif;
+    font-size: 30px;
+    letter-spacing: 2px;
+    word-spacing: 2px;
+    font-weight: 400;
+    text-decoration: none;
+    font-style: normal;
+    text-transform: none;
+    color: var(--grey);
+}
+.note{
+    font-size: 12px;
+    font-style: italic;
+    font-family: "Sansation", sans-serif;
+    font-weight: 400;
+    color: white;
+}
+
+.toggle-icon {
+    position: absolute;
+    right: 90px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }

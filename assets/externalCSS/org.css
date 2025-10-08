@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Special+Gothic+Expanded+One&display=swap');
+:root{
+    --mossgreen: #2e4b1b;
+	--green: #355f2e;
+	--light-green: #a8cd89;
+    --grey:  rgb(228, 228, 228);
+
+	--special: "Special Gothic Expanded One", sans-serif;
+    --bebas:"Bebas Neue", sans-serif;
+
+}
+.img-org{
+    height: 100px;
+    width: 100px;
+}
+.org-card a{
+    text-decoration: none;
+    font-family: var(--bebas);
+    font-size: 20px;
+
+}

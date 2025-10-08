@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Special+Gothic+Expanded+One&display=swap');
+:root{
+    --mossgreen: #2e4b1b;
+	--green: #355f2e;
+	--light-green: #a8cd89;
+    --grey:  rgb(228, 228, 228);
+
+	--special: "Special Gothic Expanded One", sans-serif;
+    --bebas:"Bebas Neue", sans-serif;
+
+}
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.card-header {
+    background-color: #fff;
+    font-weight: bold;
+    border-bottom: 2px solid #007bff;
+}
+.profile-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #007bff;
+    display: block;
+    margin: 20px auto;
+}
+.btn-change {
+    background-color: #f1c40f;
+    border: none;
+    color: #fff;
+}
+.btn-change:hover {
+    background-color: #d4ac0d;
+}
