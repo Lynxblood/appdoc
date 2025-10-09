@@ -90,7 +90,7 @@ $ranks = $ranks_result->fetch_all(MYSQLI_ASSOC);
 
 		/* NEW CSS: Ensure the modal body is contained and scrollable */
 		.modal-dialog-scrollable .modal-body {
-			max-height: calc(100vh - 200px); /* Adjust this value as needed */
+			max-height: calc(100vh - 130px); /* Adjust this value as needed */
 			overflow-y: auto;
 		}
   </style>

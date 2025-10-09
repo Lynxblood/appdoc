@@ -35,7 +35,7 @@
 		}
 		/* NEW CSS: Ensure the modal body is contained and scrollable */
 		.modal-dialog-scrollable .modal-body {
-			max-height: calc(100vh - 150px); /* Adjust this value as needed */
+			max-height: calc(100vh - 130px); /* Adjust this value as needed */
 			overflow-y: auto;
 		}
 		.editor-container {
@@ -160,7 +160,7 @@
         // echo '<img src="' . $useURL . "img/logo/logo_osas.png" . '" alt="">';
         ?>
         <div class="container-fluid">
-				<div class="container-fluid rounded-3 border border-secondary-subtle p-3 my-3">
+				<div class="container-fluid rounded-3 border border-secondary-subtle p-3 my-3 overflow-x-scroll">
 					<div class="d-flex justify-content-between align-items-center px-2">
 						<h4>Letter request</h4>
 						<button id="newApplicationButton" data-bs-toggle="modal" data-bs-target="#newApplication" type="button" class="basc-green-button btn btn-success d-flex justify-content-center align-items-center">
@@ -231,250 +231,250 @@
 		<div class="modal fade" id="newApplication" tabindex="-1" aria-labelledby="newApplicationLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-scrollable modal-fullscreen">
 				<div class="modal-content">
-				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="newApplicationLabel"></h1>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-                <form id="editorForm" method="POST" action="../function/org/save.php">
-                    <input type="hidden" name="id" id="documentId" >
-                    <input type="hidden" name="organization_id" value="<?= $_SESSION['organization_id']; ?>">
-                    <div class="modal-body">
-                        <div class="container-fluid py-4">
-                            <div class="row g-4">
-                                <div id="loadCallout" class="px-3 py-0"></div>
-                                <div class="col-lg-4">
-                                    <a href="#" id="viewCommentBtn" class="ms-2">View comments</a>
-                                    <div id="controlPanel" class=" panel">
-                                    <h6 class="mt-3">Supporting Documents (PDF only)</h6>
-                                    <div class="mb-2">
-                                        <label for="supportingDocInput" class="form-label small">Upload PDF(s)</label>
-                                        <input id="supportingDocInput" name="supporting_document[]" type="file" accept="application/pdf" multiple class="form-control">
-                                    </div>
-
-                                        <div id="existingDocumentsList" class="mt-3">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="newApplicationLabel"></h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="editorForm" method="POST" action="../function/org/save.php">
+                        <input type="hidden" name="id" id="documentId" >
+                        <input type="hidden" name="organization_id" value="<?= $_SESSION['organization_id']; ?>">
+                        <div class="modal-body">
+                            <div class="container-fluid py-4">
+                                <div class="row g-4">
+                                    <div id="loadCallout" class="px-3 py-0"></div>
+                                    <div class="col-lg-4">
+                                        <a href="#" id="viewCommentBtn" class="ms-2">View comments</a>
+                                        <div id="controlPanel" class=" panel">
+                                        <h6 class="mt-3">Supporting Documents (PDF only)</h6>
+                                        <div class="mb-2">
+                                            <label for="supportingDocInput" class="form-label small">Upload PDF(s)</label>
+                                            <input id="supportingDocInput" name="supporting_document[]" type="file" accept="application/pdf" multiple class="form-control">
                                         </div>
 
-                                        <div class="mb-3">
-                                            <label for="templateSelect" class="form-label">Use a Template</label>
-                                            <select class="form-select" id="templateSelect">
-                                                <?php
-                                                $templates_query = $conn->prepare("SELECT template_id, template_name FROM templates ORDER BY template_name ASC");
-                                                $templates_query->execute();
-                                                $templates_result = $templates_query->get_result();
-                                                if($templates_result->num_rows == 0){
-                                                    echo '<option value="">-- No Template --</option>';
-                                                }else{
-                                                    echo '<option value="">-- Select Template --</option>';
-                                                    while ($template = $templates_result->fetch_assoc()) {
-                                                        echo '<option value="' . htmlspecialchars($template['template_id']) . '">' . htmlspecialchars($template['template_name']) . '</option>';
+                                            <div id="existingDocumentsList" class="mt-3">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="templateSelect" class="form-label">Use a Template</label>
+                                                <select class="form-select" id="templateSelect">
+                                                    <?php
+                                                    $templates_query = $conn->prepare("SELECT template_id, template_name FROM templates ORDER BY template_name ASC");
+                                                    $templates_query->execute();
+                                                    $templates_result = $templates_query->get_result();
+                                                    if($templates_result->num_rows == 0){
+                                                        echo '<option value="">-- No Template --</option>';
+                                                    }else{
+                                                        echo '<option value="">-- Select Template --</option>';
+                                                        while ($template = $templates_result->fetch_assoc()) {
+                                                            echo '<option value="' . htmlspecialchars($template['template_id']) . '">' . htmlspecialchars($template['template_name']) . '</option>';
+                                                        }
                                                     }
-                                                }
-                                                $templates_query->close();
-                                                ?>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="documentHistory" class="form-label">Document History</label>
-                                            <input type="hidden" name="docHistoryId" id="docHistoryId">
-                                            <select class="form-select" id="documentHistory">
-                                                <option value="">-- Select document --</option>
-                                            </select>
-                                        </div>
-
-                                        <h2 class="h5 mb-3">Controls</h2>
-
-                                        <div class="btn-group mb-2 w-100" role="group">
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="bold"><i class="fas fa-bold"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="italic"><i class="fas fa-italic"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="underline"><i class="fas fa-underline"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="strikethrough"><i class="fas fa-strikethrough"></i></button>
-                                        </div>
-
-                                        <div class="btn-group mb-2 w-100" role="group">
-                                            <button id="h1Btn" class="btn btn-outline-secondary">H1</button>
-                                            <button id="h2Btn" class="btn btn-outline-secondary">H2</button>
-                                            <button id="pBtn" class="btn btn-outline-secondary">P</button>
-                                        </div>
-
-                                        <div class="btn-group mb-2 w-100" role="group">
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="subscript"><i class="fas fa-subscript"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="superscript"><i class="fas fa-superscript"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="removeFormat"><i class="fas fa-eraser"></i></button>
-                                        </div>
-
-                                        <h2 class="h6 mt-3">Text Formatting</h2>
-                                        <div class="btn-group mb-2 w-100" role="group">
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="justifyLeft"><i class="fas fa-align-left"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="justifyCenter"><i class="fas fa-align-center"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="justifyRight"><i class="fas fa-align-right"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="justifyFull"><i class="fas fa-align-justify"></i></button>
-                                        </div>
-
-                                        <div class="mb-2 d-flex gap-3">
-                                            <div class="child">
-                                                <label class="form-label small">Text Color</label>
-                                                <input type="color" id="textColor" value="#1a202c" class="form-control form-control-color">
+                                                    $templates_query->close();
+                                                    ?>
+                                                </select>
                                             </div>
-                                            <div class="child">
-                                                <label class="form-label small">Highlight</label>
-                                                <input type="color" id="highlightColor" value="#ffc107" class="form-control form-control-color">
+                                            <div class="mb-3">
+                                                <label for="documentHistory" class="form-label">Document History</label>
+                                                <input type="hidden" name="docHistoryId" id="docHistoryId">
+                                                <select class="form-select" id="documentHistory">
+                                                    <option value="">-- Select document --</option>
+                                                </select>
+                                            </div>
+
+                                            <h2 class="h5 mb-3">Controls</h2>
+
+                                            <div class="btn-group mb-2 w-100" role="group">
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="bold"><i class="fas fa-bold"></i></button>
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="italic"><i class="fas fa-italic"></i></button>
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="underline"><i class="fas fa-underline"></i></button>
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="strikethrough"><i class="fas fa-strikethrough"></i></button>
+                                            </div>
+
+                                            <div class="btn-group mb-2 w-100" role="group">
+                                                <button id="h1Btn" class="btn btn-outline-secondary">H1</button>
+                                                <button id="h2Btn" class="btn btn-outline-secondary">H2</button>
+                                                <button id="pBtn" class="btn btn-outline-secondary">P</button>
+                                            </div>
+
+                                            <div class="btn-group mb-2 w-100" role="group">
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="subscript"><i class="fas fa-subscript"></i></button>
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="superscript"><i class="fas fa-superscript"></i></button>
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="removeFormat"><i class="fas fa-eraser"></i></button>
+                                            </div>
+
+                                            <h2 class="h6 mt-3">Text Formatting</h2>
+                                            <div class="btn-group mb-2 w-100" role="group">
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="justifyLeft"><i class="fas fa-align-left"></i></button>
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="justifyCenter"><i class="fas fa-align-center"></i></button>
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="justifyRight"><i class="fas fa-align-right"></i></button>
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="justifyFull"><i class="fas fa-align-justify"></i></button>
+                                            </div>
+
+                                            <div class="mb-2 d-flex gap-3">
+                                                <div class="child">
+                                                    <label class="form-label small">Text Color</label>
+                                                    <input type="color" id="textColor" value="#1a202c" class="form-control form-control-color">
+                                                </div>
+                                                <div class="child">
+                                                    <label class="form-label small">Highlight</label>
+                                                    <input type="color" id="highlightColor" value="#ffc107" class="form-control form-control-color">
+                                                </div>
+                                            </div>
+
+                                            <div class="btn-group mb-2 w-100" role="group">
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="indent"><i class="fas fa-indent"></i></button>
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="outdent"><i class="fas fa-outdent"></i></button>
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
+                                                <button class="btn btn-outline-secondary" type="button" data-cmd="insertOrderedList"><i class="fas fa-list-ol"></i></button>
+                                            </div>
+
+                                            <div class="mb-2">
+                                                <label class="form-label small">Font</label>
+                                                <select id="fontSelect" class="form-select">
+                                                    <option value="arial">Arial</option>
+                                                    <option value="timesnewroman">Times New Roman</option>
+                                                    <option value="couriernew">Courier New</option>
+                                                    <option value="georgia">Georgia</option>
+                                                    <option value="verdana">Verdana</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-2">
+                                                <label class="form-label small">Letter Spacing</label>
+                                                <select id="letterSpacingSelect" class="form-select">
+                                                    <option value="0px" selected>Normal</option>
+                                                    <option value="-0.5px">Slightly Tighter</option>
+                                                    <option value="0.5px">Slightly Wider</option>
+                                                    <option value="1px">Wide</option>
+                                                </select>
+                                            </div>
+
+
+                                            <div class="mb-2">
+                                                <label class="form-label small">Font Size</label>
+                                                <select id="fontSizeSelect" class="form-select">
+                                                    <option value="10pt">10 pt</option>
+                                                    <option value="11pt" selected>11 pt</option>
+                                                    <option value="12pt">12 pt</option>
+                                                    <option value="14pt">14 pt</option>
+                                                    <option value="16pt">16 pt</option>
+                                                </select>
+                                            </div>
+
+
+                                            <div class="mb-2">
+                                                <label class="form-label small">Line Spacing</label>
+                                                <select id="lineHeightSelect" class="form-select">
+                                                <option value="1.0">Single</option>
+                                                <option value="1.5">1.5 Lines</option>
+                                                <option value="1.6" selected>Normal</option>
+                                                <option value="2.0">Double</option>
+                                                </select>
+                                            </div>
+
+                                            <h2 class="h6 mt-3">Insert</h2>
+                                            <button id="insertTableBtn" class="btn btn-outline-secondary w-100 mb-2">
+                                                <i class="fas fa-table"></i> Insert Table
+                                            </button>
+
+                                            <div class="mb-2">
+                                                <label for="imgInput" class="form-label small">Image</label>
+                                                <input id="imgInput" type="file" accept="image/*" class="form-control">
+                                            </div>
+
+                                            <div class="input-group mb-2">
+                                                <input id="linkInput" type="text" class="form-control" placeholder="https://example.com">
+                                                <button id="insertLinkBtn" class="btn btn-outline-primary"><i class="fas fa-link"></i></button>
+                                                <button id="unlinkBtn" class="btn btn-outline-danger"><i class="fas fa-unlink"></i></button>
+                                            </div>
+
+                                            <h2 class="h6 mt-3">Export</h2>
+                                            <div class="mb-2">
+                                                <label class="form-label small">PDF Size</label>
+                                                <select id="pageSizeSelect" class="form-select">
+                                                <option value="A4">A4</option>
+                                                <option value="Letter">Letter</option>
+                                                <option value="Legal" selected>Legal</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="d-flex gap-2">
+                                                <button id="clearBtn" type="button" class="btn btn-danger flex-fill"><i class="fas fa-trash"></i> Clear</button>
+                                                <button id="exportPdfBtn" type="button" class="btn btn-success flex-fill"><i class="fas fa-file-pdf"></i> Export</button>
                                             </div>
                                         </div>
-
-                                        <div class="btn-group mb-2 w-100" role="group">
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="indent"><i class="fas fa-indent"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="outdent"><i class="fas fa-outdent"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" data-cmd="insertOrderedList"><i class="fas fa-list-ol"></i></button>
-                                        </div>
-
-                                        <div class="mb-2">
-                                            <label class="form-label small">Font</label>
-                                            <select id="fontSelect" class="form-select">
-                                                <option value="arial">Arial</option>
-                                                <option value="timesnewroman">Times New Roman</option>
-                                                <option value="couriernew">Courier New</option>
-                                                <option value="georgia">Georgia</option>
-                                                <option value="verdana">Verdana</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-2">
-                                            <label class="form-label small">Letter Spacing</label>
-                                            <select id="letterSpacingSelect" class="form-select">
-                                                <option value="0px" selected>Normal</option>
-                                                <option value="-0.5px">Slightly Tighter</option>
-                                                <option value="0.5px">Slightly Wider</option>
-                                                <option value="1px">Wide</option>
-                                            </select>
-                                        </div>
-
-
-                                        <div class="mb-2">
-                                            <label class="form-label small">Font Size</label>
-                                            <select id="fontSizeSelect" class="form-select">
-                                                <option value="10pt">10 pt</option>
-                                                <option value="11pt" selected>11 pt</option>
-                                                <option value="12pt">12 pt</option>
-                                                <option value="14pt">14 pt</option>
-                                                <option value="16pt">16 pt</option>
-                                            </select>
-                                        </div>
-
-
-                                        <div class="mb-2">
-                                            <label class="form-label small">Line Spacing</label>
-                                            <select id="lineHeightSelect" class="form-select">
-                                            <option value="1.0">Single</option>
-                                            <option value="1.5">1.5 Lines</option>
-                                            <option value="1.6" selected>Normal</option>
-                                            <option value="2.0">Double</option>
-                                            </select>
-                                        </div>
-
-                                        <h2 class="h6 mt-3">Insert</h2>
-                                        <button id="insertTableBtn" class="btn btn-outline-secondary w-100 mb-2">
-                                            <i class="fas fa-table"></i> Insert Table
-                                        </button>
-
-                                        <div class="mb-2">
-                                            <label for="imgInput" class="form-label small">Image</label>
-                                            <input id="imgInput" type="file" accept="image/*" class="form-control">
-                                        </div>
-
-                                        <div class="input-group mb-2">
-                                            <input id="linkInput" type="text" class="form-control" placeholder="https://example.com">
-                                            <button id="insertLinkBtn" class="btn btn-outline-primary"><i class="fas fa-link"></i></button>
-                                            <button id="unlinkBtn" class="btn btn-outline-danger"><i class="fas fa-unlink"></i></button>
-                                        </div>
-
-                                        <h2 class="h6 mt-3">Export</h2>
-                                        <div class="mb-2">
-                                            <label class="form-label small">PDF Size</label>
-                                            <select id="pageSizeSelect" class="form-select">
-                                            <option value="A4">A4</option>
-                                            <option value="Letter">Letter</option>
-                                            <option value="Legal" selected>Legal</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="d-flex gap-2">
-                                            <button id="clearBtn" type="button" class="btn btn-danger flex-fill"><i class="fas fa-trash"></i> Clear</button>
-                                            <button id="exportPdfBtn" type="button" class="btn btn-success flex-fill"><i class="fas fa-file-pdf"></i> Export</button>
+                                        <div class=" panel comments-panel d-flex flex-column justify-content-between d-none" id="commentsPanel">
+                                            <div id="commentsContainer">
+                                            </div>
+                                            <!-- <div class="comment-form">
+                                                <input type="hidden" id="commentDocumentId">
+                                                <textarea id="commentText" placeholder="Write a comment..." rows="3"></textarea>
+                                                <div class="d-flex align-items-center flex-column justify-content-between">
+                                                    <input type="color" id="highlightColor" value="#ffc107" class="form-control form-control-color">
+                                                    <button class="btn btn-primary" id="submitCommentBtn">Send</button>
+                                                </div>
+                                            </div> -->
                                         </div>
                                     </div>
-                                    <div class=" panel comments-panel d-flex flex-column justify-content-between d-none" id="commentsPanel">
-                                        <div id="commentsContainer">
-                                        </div>
-                                        <!-- <div class="comment-form">
-                                            <input type="hidden" id="commentDocumentId">
-                                            <textarea id="commentText" placeholder="Write a comment..." rows="3"></textarea>
-                                            <div class="d-flex align-items-center flex-column justify-content-between">
-                                                <input type="color" id="highlightColor" value="#ffc107" class="form-control form-control-color">
-                                                <button class="btn btn-primary" id="submitCommentBtn">Send</button>
+                                    
+                                    <div class="col-lg-8">
+                                        <div class="panel d-flex flex-column">
+                                                <h4 class="fw-bold">Event Details</h4>
+                                            <div class="row g-3 border mx-1 my-3 p-3 rounded-4">
+                                                <div class="col-md-12">
+                                                    <label for="eventTitle" class="form-label">Title</label>
+                                                    <input type="text" class="form-control" id="eventTitle" name="eventTitle">
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <label for="eventDescription" class="form-label">Description</label>
+                                                    <input type="text" class="form-control" id="eventDescription" name="eventDescription">
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <label for="eventLocation" class="form-label">Venue</label>
+                                                    <input type="text" class="form-control" id="eventLocation" placeholder="Farmers Training Center">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="eventExpenses" class="form-label">Possible Expenses</label>
+                                                    <input type="number" class="form-control" id="eventExpenses" name="eventExpenses">
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <label for="startDateInput" class="form-label">From Date</label>
+                                                    <input type="text" class="form-control" id="startDateInput" name="eventfromDate">
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <label for="fromTime" class="form-label">From Time</label>
+                                                    <input type="time" class="form-control" id="fromTime" name="eventfromTime" value="09:00">
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <label for="endDateInput" class="form-label">To Date</label>
+                                                    <input type="text" class="form-control" id="endDateInput" name="eventtoDate">
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <label for="toTime" class="form-label">To Time</label>
+                                                    <input type="time" class="form-control" id="toTime" name="eventtoTime" value="17:00">
+                                                </div>
                                             </div>
-                                        </div> -->
-                                    </div>
-                                </div>
-                                
-                                <div class="col-lg-8">
-                                    <div class="panel d-flex flex-column">
-                                            <h4 class="fw-bold">Event Details</h4>
-                                        <div class="row g-3 border mx-1 my-3 p-3 rounded-4">
-                                            <div class="col-md-12">
-                                                <label for="eventTitle" class="form-label">Title</label>
-                                                <input type="text" class="form-control" id="eventTitle" name="eventTitle">
-                                            </div>
-                                            <div class="col-md-12">
-                                                <label for="eventDescription" class="form-label">Description</label>
-                                                <input type="text" class="form-control" id="eventDescription" name="eventDescription">
-                                            </div>
-                                            <div class="col-md-8">
-                                                <label for="eventLocation" class="form-label">Venue</label>
-                                                <input type="text" class="form-control" id="eventLocation" placeholder="Farmers Training Center">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="eventExpenses" class="form-label">Possible Expenses</label>
-                                                <input type="number" class="form-control" id="eventExpenses" name="eventExpenses">
-                                            </div>
-                                            <div class="col-md-7">
-                                                <label for="startDateInput" class="form-label">From Date</label>
-                                                <input type="text" class="form-control" id="startDateInput" name="eventfromDate">
-                                            </div>
-                                            <div class="col-md-5">
-                                                <label for="fromTime" class="form-label">From Time</label>
-                                                <input type="time" class="form-control" id="fromTime" name="eventfromTime" value="09:00">
-                                            </div>
-                                            <div class="col-md-7">
-                                                <label for="endDateInput" class="form-label">To Date</label>
-                                                <input type="text" class="form-control" id="endDateInput" name="eventtoDate">
-                                            </div>
-                                            <div class="col-md-5">
-                                                <label for="toTime" class="form-label">To Time</label>
-                                                <input type="time" class="form-control" id="toTime" name="eventtoTime" value="17:00">
-                                            </div>
-                                        </div>
-                                        
-                                        
-                                        <h4 class="fw-bold">Document</h4>
-                                        <textarea name="editorContent" id="editorContent" hidden></textarea>
-                                        <div id="editor" contenteditable="true">
+                                            
+                                            
+                                            <h4 class="fw-bold">Document</h4>
+                                            <textarea name="editorContent" id="editorContent" hidden></textarea>
+                                            <div id="editor" contenteditable="true">
 
-                                        </div>
-                                        <div class="d-flex align-items-center border-bottom mt-3 pt-2">
-                                            <label class="me-2 fw-semibold">File Name:</label>
-                                            <input id="filenameInput" name="filename" value="page-export.pdf" class="filename-input">
+                                            </div>
+                                            <div class="d-flex align-items-center border-bottom mt-3 pt-2">
+                                                <label class="me-2 fw-semibold">File Name:</label>
+                                                <input id="filenameInput" name="filename" value="page-export.pdf" class="filename-input">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success basc-green-button">Save changes</button>
-                    </div>
-                </form>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success basc-green-button">Save changes</button>
+                        </div>
+                    </form>
 				</div>
 			</div>
 		</div>

@@ -13,6 +13,13 @@
   --bebas:"Bebas Neue", sans-serif;
   --sansation: "Sansation", sans-serif;
 }
+.text-theme-green{
+  color: var(--green) !important;
+}
+
+.normal-theme-text{
+  text-decoration: none;
+}
 
 body {
   overflow-x: hidden;
@@ -91,6 +98,7 @@ body {
 .sidebar.collapsed {
   width: var(--sidebar-width-collapsed);
 }
+
 .sidebar-link {
   color: var(--beige);
   transition: all 0.2s ease;
@@ -194,6 +202,16 @@ body {
 	background-color: var(--green);
   
 }
+.toggle-btn::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: -1px 0px 6px 2px rgba(0,0,0,0.30);
+  clip-path: circle(55% at 45% 50%); 
+  z-index: -1;
+}
+
 .toggle-btn:hover{
 	background: white;
   color: var(--green);
@@ -688,4 +706,43 @@ table {
   text-overflow: ellipsis;
   max-width: 280px; /* Adjust this value as needed to fit your dropdown width */
   display: block;
+}
+/* screen less than sm */
+@media (max-width: 576px){
+  .sidebar.collapsed{
+    overflow: hidden;
+  }
+  .collapsed{
+    --sidebar-width-collapsed: 0;
+  }
+  
+  .main-content {
+    margin-left: 0;
+  }
+  .collapsed~.main-content {
+    margin-left: 0;
+  }
+  
+  .toggle-btn {
+    left: 255px;
+    transition: all 0.3s ease;
+  }
+  .collapsed~.main-content .toggle-btn {
+    left: 0;
+  }
+}
+/* sm screen */
+@media (min-width: 576px){
+}
+/* md screen */
+@media (min-width: 768px){
+}
+/* lg screen */
+@media (min-width: 992px){
+}
+/* xl screen */
+@media (min-width: 1200px){
+}
+/* xxl screen */
+@media (min-width: 1400px){
 }

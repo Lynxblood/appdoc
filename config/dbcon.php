@@ -11,9 +11,6 @@
     
     // CHANGE THIS VALUE TO true OR false
     $maintenance_mode = false; 
-
-    // OPTIONAL: Define a path for the static maintenance page
-    
     $maintenance_page = __DIR__ . '/maintenance_page.html'; 
     
     if ($maintenance_mode === true) {

@@ -87,7 +87,7 @@
                                 <option value="dean">Dean</option>
                                 <option value="osas">OSAS</option>
                                 <option value="fssc">FSSC</option>
-                                <option value="vice_pres_academic_affairs">Vice Pres. Academic Affairs</option>
+                                <!-- <option value="vice_pres_academic_affairs">Vice Pres. Academic Affairs</option> -->
                             </select>
                         </div>
 
@@ -107,12 +107,12 @@
                             </select>
                         </div>
                         
-                        <div class="d-grid register-but gap-2 col-6 mx-auto mt-2">
-                            <button class="btn text-white" type="submit">SIGN UP</button>
+                        <div class="d-grid gap-2 col-6 mx-auto mt-2">
+                            <button class="register-account-button btn mt-3" type="submit">SIGN UP</button>
                         </div>
 
                         <div class="col-12 d-flex justify-content-center mt-3">
-                            <p class="register-text">Already a member? <a href="../index.php" class="fw-bold fst-italic">Log in</a> here.</p>
+                            <p class="register-text">Already a member? <a href="../index.php" class="fw-bold fst-italic normal-theme-text text-theme-green">Log in</a> here.</p>
                         </div>
                     </form>
                 </div>
@@ -135,7 +135,7 @@
                                     We're happy to have you back! This platform is designed to help you and your organization stay organized and efficient. 
                                     <br><br>If your organization has not been registered yet, please register using the button below.
                                 </p>
-                                <a href="../pages/register-account.php" class="register-account-button btn mt-3">Register Org</a>
+                                <!-- <a href="../pages/register-account.php" class="register-account-button btn mt-3">Register Org</a> -->
                             </div>
                         </div>
                     </div>

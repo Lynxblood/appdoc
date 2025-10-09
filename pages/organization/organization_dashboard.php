@@ -104,7 +104,7 @@
                 <?php endif; ?>
             </div>
             
-            <div class="container-fluid rounded-3 border border-secondary-subtle p-3 my-3 panel">
+            <div class="container-fluid rounded-3 border border-secondary-subtle p-3 my-3 panel  overflow-x-scroll">
                 <div class="d-flex justify-content-between align-items-center px-2 mb-3">
                     <h4>Current Members</h4>
                     <button data-bs-toggle="modal" data-bs-target="#addMemberModal" type="button" class="basc-green-button btn btn-success d-flex justify-content-center align-items-center">

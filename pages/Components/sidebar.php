@@ -1,6 +1,6 @@
 	<!-- SIDEBAR -->
-	<div class="d-flex">
-		<nav class="sidebar d-flex flex-column flex-shrink-0 position-fixed">
+	<div class="d-flex sidebar-parent">
+		<nav class="sidebar d-flex flex-column flex-shrink-0 position-fixed z-3">
 			<div class=" logo py-3 px-1" >
 				<div class="container">
 					<div class="row">
@@ -126,9 +126,9 @@
 							?>
 
 
-							<div class="col-4 align-content-center">
+							<a href="dashboard.php" class="col-4 align-content-center">
 								<img src="<?php echo $logo_path; ?>" alt="User Logo">
-							</div>
+							</a>
 							<div class=" role col-8 mb-1">
 								<h4 class="fw-bold mb-0 ms-1 me-5 w-100 w-md-auto text-white text-shadow">
 									<?php
@@ -335,30 +335,30 @@
 				</div>
 			</div>
     	</nav>
-	<!-- Navigation -->
-	<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-		<div class="modal-header">
-			<h5 class="modal-title" id="notificationModalLabel">Notification Details</h5>
-			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		<!-- Navigation -->
+		<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="notificationModalLabel">Notification Details</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p id="notificationMessage"></p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="modal-body">
-			<p id="notificationMessage"></p>
-		</div>
-		<div class="modal-footer">
-			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-		</div>
-		</div>
-	</div>
-	</div>
 		<main class="main-content p-0">
 			<nav class="navbar navbar-light  p-0">
-				<button class="toggle-btn" onclick="toggleSidebar()">
+				<button class="toggle-btn " onclick="toggleSidebar()">
 					<i class="fas fa-bars"></i>
 				</button>
 				<div class=" dash container-fluid ms-4 py-1">
-					<p class="m-0">DASHBOARD</p>
+					<p class="m-0" id="pageTitleNav"></p>
 					<!-- NOTIFICATIONS -->
                     <!-- <div class="btn-group dropstart">
                         <svg class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="me-3" viewBox="0 0 24 24" style="fill: rgb(0, 0, 0);">

@@ -35,7 +35,7 @@
                                         <div class="col-12 text-center mt-2 ">
                                             <h3 class="header-text">Welcome Back!</h3>
                                     <p class="signup-text">We're happy to have you back! This platform is designed to help you and your organization stay organized and efficient. <br><br>If your organization has not been registered yet, please register using the button below.</p>
-                                    <a href="pages/register-account.php" class="register-account-button btn mt-3">Register Org</a>
+                                    <!-- <a href="pages/register-account.php" class="register-account-button btn mt-3">Register Org</a> -->
                                         </div>
                                     </div>
                                 </div>
@@ -78,14 +78,14 @@
                             </div>
                             <div class="row px-4 py-0 mb-3">
                                 <div class="col py-0">
-                                    <a href="" class="forgotpass">Forgot Password?</a>
+                                    <a href="" class="forgotpass normal-theme-text text-theme-green">Forgot Password?</a>
                                 </div>
                             </div>
-                            <div class="d-grid register-but gap-2 col-6 mx-auto mt-2">
-                                <button class="btn text-white" type="submit" name="login">LOGIN</button>
+                            <div class="d-grid gap-2 col-6 mx-auto mt-2">
+                                <button class="register-account-button btn mt-3" type="submit" name="login">LOGIN</button>
                             </div>
                             <div class="col-12 d-flex justify-content-end align-items-end">
-                                <p class="register-text">Don’t have an account yet?  <a href="pages/register.php" class="fw-bold fst-italic">Sign Up</a> here first.</p>
+                                <p class="register-text">Don’t have an account yet?  <a href="pages/register.php" class="fw-bold fst-italic normal-theme-text text-theme-green">Sign Up</a> here first.</p>
                             </div>
                         </form>
                     </div>

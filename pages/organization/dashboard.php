@@ -40,7 +40,7 @@
 		}
 		/* NEW CSS: Ensure the modal body is contained and scrollable */
 		.modal-dialog-scrollable .modal-body {
-			max-height: calc(100vh - 200px); /* Adjust this value as needed */
+			max-height: calc(100vh - 130px); /* Adjust this value as needed */
 			overflow-y: auto;
 		}
 		.editor-container {
@@ -225,76 +225,76 @@
     <?php include '../Components/sidebar.php'; ?>
     <div class="container-fluid">
         <div class="row py-4 ">
-            <div class="col-8 pt-4">
+            <div class="col-md-8 pt-4">
                 <div class="row">
                     <div class="col-12 mb-2">
                         <div class="panel">
                             <h5 class="mb-3">Quick Actions</h5>
-                            <div class="d-flex gap-3">
-                                <button id="newApplicationButton" data-bs-toggle="modal" data-bs-target="#newApplication" type="button" class="btn btn-outline-primary d-flex align-items-center flex-grow-1">
+                            <div class="row gap-3">
+                                <button id="newApplicationButton" data-bs-toggle="modal" data-bs-target="#newApplication" type="button" class="col-md-5 btn btn-outline-primary d-flex align-items-center flex-grow-1">
                                     <i class="fa-solid fa-file-circle-plus me-2"></i> Create Document
                                 </button>
-                                <button id="useTemplateButton" data-bs-toggle="modal" data-bs-target="#newApplication" type="button" class="btn btn-outline-success d-flex align-items-center flex-grow-1">
+                                <button id="useTemplateButton" data-bs-toggle="modal" data-bs-target="#newApplication" type="button" class="col-md-5 btn btn-outline-success d-flex align-items-center flex-grow-1">
                                     <i class="fa-solid fa-file-lines me-2"></i> Use Template
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-6 mb-2">
-                        <div class="card cardeve shadow" style="height: 120px;">
-                            <div class="card-body p-1 d-flex justify-content-center align-items-center">
-                                <div class="row">
-                                    <div class="col-5 p-2">
+                    <div class="col-md-6 mb-2">
+                        <div class="card cardeve shadow " style="height: 135px;">
+                            <div class="container card-body p-3">
+                                <div class="row align-items-center">
+                                    <div class="col-3 p-2 d-flex justify-content-center align-items-center">
                                         <i class="fas fa-file-alt fa-3x text-info"></i>
                                     </div>
-                                    <div class="col-7 p-2 text-center align-content-center">
-                                        <span><p class="text-number p-0 m-0"><?= $draft_count; ?></p></span>
+                                    <div class="col-9 p-2 text-center align-content-center">
+                                        <span><p class="fs-1 text-number p-0 m-0"><?= $draft_count; ?></p></span>
                                         <span><p class="text-title p-0 m-0">Draft Documents</p></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 mb-2">
-                        <div class="card cardeve shadow" style="height: 120px;">
-                            <div class="card-body p-1 d-flex justify-content-center align-items-center">
-                                <div class="row">
-                                    <div class="col-5 p-2">
+                    <div class="col-md-6 mb-2">
+                        <div class="card cardeve shadow " style="height: 135px;">
+                            <div class="container card-body p-3">
+                                <div class="row align-items-center">
+                                    <div class="col-3 p-2 d-flex justify-content-center align-items-center">
                                         <i class="fas fa-check-circle fa-3x text-warning"></i>
                                     </div>
-                                    <div class="col-7 p-2 text-center align-content-center">
-                                        <span><p class="text-number p-0 m-0"><?= $submitted_count; ?></p></span>
+                                    <div class="col-9 p-2 text-center align-content-center">
+                                        <span><p class="fs-1 text-number p-0 m-0"><?= $submitted_count; ?></p></span>
                                         <span><p class="text-title p-0 m-0">Submitted Documents</p></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 mb-3">
-                        <div class="card cardeve shadow" style="height: 120px;">
-                            <div class="card-body p-1 d-flex justify-content-center align-items-center">
-                                <div class="row">
-                                    <div class="col-5 p-2">
+                    <div class="col-md-6 mb-3">
+                        <div class="card cardeve shadow " style="height: 135px;">
+                            <div class="container card-body p-3">
+                                <div class="row align-items-center">
+                                    <div class="col-3 p-2 d-flex justify-content-center align-items-center">
                                         <i class="fas fa-thumbs-up fa-3x text-success"></i>
                                     </div>
-                                    <div class="col-7 p-2 text-center align-content-center">
-                                        <span><p class="text-number p-0 m-0"><?= $approved_count; ?></p></span>
+                                    <div class="col-9 p-2 text-center align-content-center">
+                                        <span><p class="fs-1 text-number p-0 m-0"><?= $approved_count; ?></p></span>
                                         <span><p class="text-title p-0 m-0">Approved Documents</p></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 mb-3">
-                        <div class="card cardeve shadow" style="height: 120px;">
-                            <div class="card-body p-1 d-flex justify-content-center align-items-center">
-                                <div class="row">
-                                    <div class="col-5 p-2">
+                    <div class="col-md-6 mb-3">
+                        <div class="card cardeve shadow " style="height: 135px;">
+                            <div class="container card-body p-3">
+                                <div class="row align-items-center">
+                                    <div class="col-3 p-2 d-flex justify-content-center align-items-center">
                                         <i class="fas fa-calendar-alt fa-3x text-danger"></i>
                                     </div>
-                                    <div class="col-7 p-2 text-center align-content-center">
-                                        <span><p class="text-number p-0 m-0"><?= $upcoming_events_count; ?></p></span>
+                                    <div class="col-9 p-2 text-center align-content-center">
+                                        <span><p class="fs-1 text-number p-0 m-0"><?= $upcoming_events_count; ?></p></span>
                                         <span><p class="text-title p-0 m-0">Upcoming Events</p></span>
                                     </div>
                                 </div>
@@ -332,7 +332,7 @@
                 </div>
             </div>
             
-            <div class="col-4">
+            <div class="col-md-4">
                 <div class="card eventcard shadow" style="height: 100%;">
                     <div class="card-body">
                         <h4 class="card-title titlesummary text-center">Upcoming Events</h4>
@@ -359,7 +359,7 @@
     </div>
     
     <div class="container-fluid">
-        <div class="container-fluid rounded-3 border border-secondary-subtle p-3 my-3">
+        <div class="container-fluid rounded-3 border border-secondary-subtle p-3 my-3 overflow-x-scroll">
             <div class="d-flex justify-content-between align-items-center px-2">
                 <h4>Recent Documents</h4>
                 <button id="newApplicationButton" data-bs-toggle="modal" data-bs-target="#newApplication" type="button" class="basc-green-button btn btn-success d-flex justify-content-center align-items-center">

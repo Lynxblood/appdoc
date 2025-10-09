@@ -35,7 +35,7 @@
 		}
 		/* NEW CSS: Ensure the modal body is contained and scrollable */
 		.modal-dialog-scrollable .modal-body {
-			max-height: calc(100vh - 200px); /* Adjust this value as needed */
+			max-height: calc(100vh - 130px); /* Adjust this value as needed */
 			overflow-y: auto;
 		}
 		.editor-container {
@@ -166,7 +166,7 @@
         // echo '<img src="' . $useURL . "img/logo/logo_osas.png" . '" alt="">';
         ?>
         <div class="container-fluid">
-				<div class="container-fluid rounded-3 border border-secondary-subtle p-3 my-3">
+				<div class="container-fluid rounded-3 border border-secondary-subtle p-3 my-3 overflow-x-scroll">
 					<div class="d-flex justify-content-between align-items-center px-2">
 						<h4>Letter request</h4>
 						<button id="templateModalButton" data-bs-toggle="modal" data-bs-target="#templateModal" type="button" class="basc-green-button btn btn-success d-flex justify-content-center align-items-center">
