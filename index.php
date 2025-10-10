@@ -97,7 +97,7 @@
     <script src="assets/jquery/jquery-3.7.1.min.js"></script> <!-- added by me -->
     <script>
         
-    alertify.set('notifier','position', 'top-left');
+    alertify.set('notifier','position', 'top-right');
     function togglePasswordVisibility() {
         const passwordInput = document.getElementById("password");
         const eyeIcon = document.getElementById("eyeIcon");

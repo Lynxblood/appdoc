@@ -6,6 +6,8 @@ require '../../config/dbcon.php';
 use Mpdf\Mpdf;
 use Mpdf\Config\ConfigVariables;
 use Mpdf\Config\FontVariables;
+use Mpdf\QrCode\QrCode;
+use Mpdf\QrCode\Output;
 
 $defaultConfig = (new ConfigVariables())->getDefaults();
 $fontDirs = $defaultConfig['fontDir'];
@@ -19,8 +21,9 @@ try {
 
     // Check if a document ID is provided
     if ($document_id) {
-        // A document ID exists, fetch the logo from the document's organization
-        $sql_logo = "SELECT o.logo FROM documents d JOIN organizations o ON d.organization_id = o.organization_id WHERE d.document_id = ?";
+        $sql_logo = "SELECT o.logo FROM documents d 
+                     JOIN organizations o ON d.organization_id = o.organization_id 
+                     WHERE d.document_id = ?";
         $stmt_logo = $conn->prepare($sql_logo);
         $stmt_logo->bind_param("i", $document_id);
         $stmt_logo->execute();
@@ -31,8 +34,10 @@ try {
         }
         $stmt_logo->close();
         
+        // --- QR CODE DATA GENERATION ---
+        $useURL = $useURL . "auth/document.php"; // *** UPDATE THIS BASE URL ***
+        $qr_data_url = $useURL . "?document_id=" . $document_id; 
     } elseif (isset($_SESSION['organization_id'])) {
-        // No document ID, use the organization ID from the session
         $organization_id = $_SESSION['organization_id'];
         $sql_logo = "SELECT logo FROM organizations WHERE organization_id = ?";
         $stmt_logo = $conn->prepare($sql_logo);
@@ -44,8 +49,14 @@ try {
             $logoRight = '../../' . $row['logo'];
         }
         $stmt_logo->close();
+
+        $useURL = $useURL . "auth/document.php";
+        $qr_data_url = $useURL . "?organization_id=" . $organization_id; 
+    } else {
+        $qr_data_url = $useURL;
     }
-    
+
+    // Fetch signatures
     $sql_signatures = "SELECT u.user_role, dh.e_signature_code, u.e_signature_path
                         FROM document_history dh
                         JOIN users u ON dh.modified_by_user_id = u.user_id
@@ -65,6 +76,7 @@ try {
     }
     $stmt_signatures->close();
 
+    // Initialize mPDF
     $mpdf = new Mpdf([
         'format'        => $_POST['page_size'] ?? 'A4',
         'margin_left'   => 0,
@@ -73,45 +85,19 @@ try {
         'margin_bottom' => 35,
         'fontDir' => array_merge($fontDirs, ['../../assets/fonts']), 
         'fontdata' => $fontData + [
-            'arial' => [
-                'R' => 'arial.ttf',
-                'B' => 'arialbd.ttf',
-                'I' => 'ariali.ttf',
-                'BI' => 'arialbi.ttf',
-            ],
-            'timesnewroman' => [
-                'R' => 'times.ttf',
-                'B' => 'timesbd.ttf',
-                'I' => 'timesi.ttf',
-                'BI' => 'timesbi.ttf',
-            ],
-            'couriernew' => [
-                'R' => 'cour.ttf',
-                'B' => 'courbd.ttf',
-                'I' => 'couri.ttf',
-                'BI' => 'courbi.ttf',
-            ],
-            'georgia' => [
-                'R' => 'georgia.ttf',
-                'B' => 'georgiab.ttf',
-                'I' => 'georgiai.ttf',
-                'BI' => 'georgiaz.ttf',
-            ],
-            'verdana' => [
-                'R' => 'verdana.ttf',
-                'B' => 'verdanab.ttf',
-                'I' => 'verdanai.ttf',
-                'BI' => 'verdanaz.ttf',
-            ]
+            'arial' => ['R' => 'arial.ttf', 'B' => 'arialbd.ttf', 'I' => 'ariali.ttf', 'BI' => 'arialbi.ttf'],
+            'timesnewroman' => ['R' => 'times.ttf', 'B' => 'timesbd.ttf', 'I' => 'timesi.ttf', 'BI' => 'timesbi.ttf'],
+            'couriernew' => ['R' => 'cour.ttf', 'B' => 'courbd.ttf', 'I' => 'couri.ttf', 'BI' => 'courbi.ttf'],
+            'georgia' => ['R' => 'georgia.ttf', 'B' => 'georgiab.ttf', 'I' => 'georgiai.ttf', 'BI' => 'georgiaz.ttf'],
+            'verdana' => ['R' => 'verdana.ttf', 'B' => 'verdanab.ttf', 'I' => 'verdanai.ttf', 'BI' => 'verdanaz.ttf']
         ],
-        
         'default_font' => 'arial'
     ]);
 
-    $filename   = $_POST['filename'] ?? 'page-export.pdf';
-    $content    = $_POST['html_content'] ?? '';
-    
-    // In pdf_export.php, locate the signature replacement logic
+    $filename = $_POST['filename'] ?? 'page-export.pdf';
+    $content  = $_POST['html_content'] ?? '';
+
+   // In pdf_export.php, locate the signature replacement logic
 
     // For Adviser Signature
     if (isset($signature_data['adviser'])) {
@@ -130,6 +116,8 @@ try {
         $signature_html .= '</div>';
         
         $content = str_replace('[ADVISER_SIGNATURE]', $signature_html, $content);
+    }else{ 
+        $content = str_replace('[ADVISER_SIGNATURE]', '', $content);
     }
 
     // For Dean Signature
@@ -148,6 +136,8 @@ try {
         $signature_html .= '</div>';
         
         $content = str_replace('[DEAN_SIGNATURE]', $signature_html, $content);
+    }else{ 
+        $content = str_replace('[DEAN_SIGNATURE]', '', $content);
     }
 
      // For Dean Signature
@@ -166,8 +156,10 @@ try {
         $signature_html .= '</div>';
         
         $content = str_replace('[FSSC_SIGNATURE]', $signature_html, $content);
+    }else{ 
+        $content = str_replace('[FSSC_SIGNATURE]', '', $content);
     }
-    
+
     $logoLeft   = '../../img/logo/basc_logo.png';
     $footerLeft = '../../img/logo/iso9001.png';
     $footerRight= '../../img/logo/bagongphil.png';
@@ -191,7 +183,18 @@ try {
     </table>
     ';
 
+    // ✅ --- FIXED QR CODE GENERATION (Replaces <qrcode> tag) ---
+    $qrCode = new QrCode($qr_data_url);
+    $output = new Output\Png();
+    $qrImageData = base64_encode($output->output($qrCode, 150)); // 150px QR code
+
     $footerHtml = '
+    <div style="display: inline-block; text-align: right; margin-right: 60px;">
+        <div style="font-family: Arial, sans-serif; font-size: 8pt; color: #888; margin-top: 3px;">
+            Authenticate:
+        </div>
+        <img src="data:image/png;base64,' . $qrImageData . '" width="70" alt="QR Code" />
+    </div>
     <table width="90%" style="font-family:Arial, sans-serif; font-size:13px; border-collapse: collapse; margin-bottom:0;margin-left:auto;margin-right:auto;">
         <tr>
             <td width="15%" align="right">
@@ -208,7 +211,8 @@ try {
         </tr>
     </table>
     ';
-    
+    // -----------------------------------------------------------
+
     $mpdf->SetHTMLHeader($headerHtml);
     $mpdf->SetHTMLFooter($footerHtml);
 

@@ -181,7 +181,7 @@
 						</thead>
 						<tbody >
                         <?php
-                            $sql = "SELECT * FROM documents WHERE user_id = '" . $_SESSION['user_id'] . "'";
+                            $sql = "SELECT * FROM documents WHERE organization_id = '" . $_SESSION['organization_id'] . "'";
                             $result = $conn->query($sql);
 
                             if ($result->num_rows > 0) {
@@ -208,7 +208,7 @@
                                                 echo '
                                                     <li><a class="dropdown-item view-pdf" href="#" data-id="'. $row['document_id'] .'" data-bs-toggle="modal" data-bs-target="#viewPdfApplication">View</a></li>';
                                                 
-                                                    if ($row['status'] == 'revision' || $row['status'] == 'draft') {
+                                                    if (true) {
                                                         echo '
                                                         <li><a class="dropdown-item edit-pdf" href="#" data-id="'. $row['document_id'] .'">Edit</a></li>
                                                         <li><a class="dropdown-item delete-pdf" data-id="'. $row['document_id'] .'" href="#">Delete</a></li>';
@@ -243,7 +243,7 @@
                                 <div class="row g-4">
                                     <div id="loadCallout" class="px-3 py-0"></div>
                                     <div class="col-lg-4">
-                                        <a href="#" id="viewCommentBtn" class="ms-2">View comments</a>
+                                        <button type="button" class="btn btn-success basc-green-button m-2" id="viewCommentBtn">View comments</button>
                                         <div id="controlPanel" class=" panel">
                                         <h6 class="mt-3">Supporting Documents (PDF only)</h6>
                                         <div class="mb-2">

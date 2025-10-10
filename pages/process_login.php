@@ -22,10 +22,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: ../config/redirect.php");
             exit();
         } else {
-            echo "Invalid password.";
+            $_SESSION['message'] = 'Wrong Password!';
+            $_SESSION['msgtype'] = "error";
+            $_SESSION['havemsg'] = true;
+            
+            header("Location: ../index.php");
         }
     } else {
-        echo "No user found with that email.";
+        $_SESSION['message'] = 'No user found with that email.';
+        $_SESSION['msgtype'] = "error";
+        $_SESSION['havemsg'] = true;
+        
+        header("Location: ../index.php");
     }
 
     $stmt->close();

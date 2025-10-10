@@ -13,13 +13,13 @@ $sql = "SELECT e.event_id, e.title, e.description, e.start_date, e.end_date, e.l
                    )
                    FROM documents d
                    WHERE d.event_id = e.event_id 
-                     AND d.status = 'approved'
+                     AND d.status = 'approved_fssc'
                ) AS documents
         FROM events e
         LEFT JOIN organizations o ON e.organization_id = o.organization_id
         WHERE EXISTS (
             SELECT 1 FROM documents d2 
-            WHERE d2.event_id = e.event_id AND d2.status = 'approved'
+            WHERE d2.event_id = e.event_id AND d2.status = 'approved_fssc'
         )";
 
 $result = $conn->query($sql);

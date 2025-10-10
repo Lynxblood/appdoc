@@ -727,8 +727,16 @@ table {
     left: 255px;
     transition: all 0.3s ease;
   }
+  
   .collapsed~.main-content .toggle-btn {
     left: 0;
+    border-radius: 0;
+    background: transparent;
+    color:var(--green);
+    box-shadow: none;
+  }
+  .collapsed~.main-content .toggle-btn::after{
+    box-shadow: none;
   }
 }
 /* sm screen */

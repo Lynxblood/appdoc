@@ -44,7 +44,7 @@
   }
 
   // 3. Fetch all members/users of this organization
-  $members_query = $conn->prepare("SELECT user_id, first_name, last_name, email, user_role FROM users WHERE organization_id = ? ORDER BY last_name ASC");
+  $members_query = $conn->prepare("SELECT u.user_id, u.first_name, u.last_name, u.email, u.user_role, org.rank_name FROM users u JOIN organization_ranks org ON u.rank_id = org.rank_id WHERE organization_id = ? ORDER BY last_name ASC");
   $members_query->bind_param("i", $organization_id);
   $members_query->execute();
   $members_result = $members_query->get_result();
@@ -89,15 +89,29 @@
             <div class="container-fluid rounded-3 border border-secondary-subtle p-3 my-3 panel">
                 <div class="d-flex justify-content-between align-items-center px-2">
                     <h4>Organization Profile</h4>
-                    <button data-bs-toggle="modal" data-bs-target="#editOrganizationModal" type="button" class="btn btn-primary d-flex justify-content-center align-items-center">
-                        <i class='bx bxs-edit-alt' ></i>&nbsp;Edit Profile
-                    </button>
+                    
+                    <?php
+                        $sql_btnAccess = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.user_role, org.rank_name FROM users u JOIN organization_ranks org ON u.rank_id = org.rank_id WHERE user_id = ? ";   
+                        $stmt_btnAccess = $conn->prepare($sql_btnAccess);
+                        $stmt_btnAccess->bind_param("i", $_SESSION['user_id']);
+                        $stmt_btnAccess->execute();
+                        $result_btnAccess = $stmt_btnAccess->get_result();
+                        $row = $result_btnAccess->fetch_assoc();
+                        $cur_user = $row['user_id'] == $_SESSION['user_id'];
+
+                        if ($cur_user && $row['rank_name'] == 'President') {
+                            echo '
+                            <button data-bs-toggle="modal" data-bs-target="#editOrganizationModal" type="button" class="btn btn-primary d-flex justify-content-center align-items-center">
+                                <i class="bx bxs-edit-alt" ></i>&nbsp;Edit Profile
+                            </button>';
+                        }
+                    ?>
                 </div>
                 <?php if ($org_details): ?>
                 <div class="row pt-3">
                     <div class="col-md-6"><strong>Name:</strong> <?= htmlspecialchars($org_details['name']) ?></div>
                     <div class="col-md-6"><strong>Type:</strong> <?= ucfirst(htmlspecialchars($org_details['type'])) ?></div>
-                    <div class="col-md-6"><strong>Rank:</strong> <?= htmlspecialchars($org_details['rank_name']) ?></div>
+                    <!-- <div class="col-md-6"><strong>Rank:</strong> <?= htmlspecialchars($org_details['rank_name']) ?></div> -->
                     </div>
                 <?php else: ?>
                 <p class="text-danger mt-3">Organization details not found.</p>
@@ -116,30 +130,49 @@
                         <tr>
                             <th>Member Name</th>
                             <th>Email</th>
-                            <th>Role</th>
+                            <th>Rank</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody >
                         <?php
                         if ($members_result->num_rows > 0) {
+                            // First, determine if the logged-in user is the President
+                            $is_president = false;
+                            mysqli_data_seek($members_result, 0); // reset pointer if used multiple times
+                            while ($row_check = $members_result->fetch_assoc()) {
+                                if ($row_check['user_id'] == $user_id && $row_check['rank_name'] == 'President') {
+                                    $is_president = true;
+                                    break;
+                                }
+                            }
+
+                            // Reset the result pointer to loop again
+                            mysqli_data_seek($members_result, 0);
+
+                            // Now display members
                             while ($row = $members_result->fetch_assoc()) {
                                 $name = htmlspecialchars($row["first_name"]) . " " . htmlspecialchars($row["last_name"]);
                                 $is_current_user = ($row["user_id"] == $user_id);
+
                                 echo "<tr>";
                                 echo "<td>" . $name . "</td>";
                                 echo "<td>" . htmlspecialchars($row["email"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["user_role"]) . "</td>";
-                                echo '<td>';
-                                if (!$is_current_user) {
-                                    echo '<button class="btn btn-sm btn-outline-danger leave-org-btn" data-id="'. $row['user_id'] .'" data-name="'. $name .'">Remove Member</button>';
-                                } else {
+                                echo "<td>" . htmlspecialchars($row["rank_name"]) . "</td>";
+                                echo "<td>";
+
+                                // Only the President can remove other members (but not themselves or other presidents)
+                                if ($is_president && !$is_current_user && $row['rank_name'] != 'President') {
+                                    echo '<button class="btn btn-sm btn-outline-danger leave-org-btn" data-id="' . $row['user_id'] . '" data-name="' . $name . '">Remove Member</button>';
+                                } elseif ($is_current_user) {
                                     echo '<span class="badge text-bg-secondary">Current User</span>';
                                 }
-                                echo '</td>';
+
+                                echo "</td>";
                                 echo "</tr>";
                             }
                         }
+
                         ?>
                     </tbody>
                 </table>
