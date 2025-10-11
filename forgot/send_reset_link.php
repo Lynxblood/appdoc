@@ -1,72 +1,115 @@
 <?php
-// Include the PHPMailer files
+include '../config/dbcon.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+require 'mail/Exception.php';
 require 'mail/PHPMailer.php';
-// You'll typically need to include the SMTP class as well if you use SMTP
 require 'mail/SMTP.php';
-require 'mail/Exception.php'; 
 
+if (isset($_POST['resetbtn'])) {
+    $resetemail = mysqli_real_escape_string($conn, $_POST['resetemail']);
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email'])) {
-    
-    $email = $_POST['email'];
+    // Query the users table
+    $checkemail = $conn->query("SELECT user_id, email FROM users WHERE email = '$resetemail' LIMIT 1");
 
-    // 1. --- Security & Database Check (Conceptual) ---
-    
-    // In a real application:
-    // a) Check if the $email exists in your 'users' table.
-    // b) Generate a unique token, e.g., $token = bin2hex(random_bytes(32));
-    // c) Store this $token in a 'password_resets' table along with the user ID and an expiry timestamp.
-    
-    // For this simple example, we'll use a placeholder token.
-    $token = "UNIQUE_RESET_TOKEN_12345"; 
-    $resetLink = "http://yourwebsite.com/reset_password.php?token=" . $token; // Replace with your actual domain/page
+    if ($checkemail->num_rows === 0) {
+        echo "<script>alertify.error('User not found!');</script>";
+        exit;
+    }
 
-    // 2. --- PHPMailer Configuration ---
+    $user = $checkemail->fetch_assoc();
 
+    // Generate reset code
+    $code = substr(str_shuffle('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+
+    // Update reset code in the database
+    if (!$conn->query("UPDATE users SET reset_code = '$code' WHERE email = '$resetemail'")) {
+        echo "<script>alertify.error('Failed to update reset code in database.');</script>";
+        exit;
+    }
+
+    // Create PHPMailer instance
     $mail = new PHPMailer(true);
 
     try {
-        //Server settings
-        $mail->isSMTP();                                            // Send using SMTP
-        $mail->Host       = 'smtp.example.com';                     // Set the SMTP server to send through
-        $mail->SMTPAuth   = true;    
-        $mail->Username = 'pdaosmb@gmail.com';  // Sender's email
-        $mail->Password = 'wzve xetg zdmw fidq';  // SMTP password (App Password recommended)// SMTP password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-        $mail->Port       = 587;                                    // TCP port to connect to
+        // SMTP Configuration
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'bascdocument@gmail.com';  // Sender email
+        $mail->Password = 'czih audl hjdu nbaj';    // App password (not your real Gmail password)
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
 
-        //Recipients
-        $mail->setFrom('no-reply@yourwebsite.com', 'Your Website Name');
-        $mail->addAddress($email);                                  // Add a recipient
+        // Recipients
+        $mail->setFrom('bascdocument@gmail.com', 'BASC Document');
+        $mail->addAddress($user['email']);
 
-        //Content
-        $mail->isHTML(true);                                        // Set email format to HTML
+        // Email Content
+        $mail->isHTML(true);
         $mail->Subject = 'Password Reset Request';
-        $mail->Body    = "Dear User,<br><br>
-                         You requested a password reset. Click the link below to reset your password:<br>
-                         <a href='$resetLink'>$resetLink</a><br><br>
-                         If you did not request this, please ignore this email.";
-        $mail->AltBody = "You requested a password reset. Copy and paste the following link into your browser: $resetLink";
+        $mail->Body = '
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; padding: 20px;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td align="center">
+                    <table width="600" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                        
+                        <tr>
+                            <td align="center" style="background-color: #4CAF50; padding: 30px 20px;">
+                                <h1 style="color: #ffffff; font-weight: bold; margin: 0; font-size: 24px;">Password Reset Request</h1>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="padding: 40px 30px 30px 30px; text-align: left;">
+                                <p style="margin: 0 0 15px 0;">Hello,</p>
+                                <p style="margin: 0 0 25px 0;">We received a request to reset your password. Click the button below to set a new one:</p>
+                                
+                                <table border="0" cellspacing="0" cellpadding="0" style="margin: 25px 0; width: 100%;">
+                                    <tr>
+                                        <td align="left">
+                                            <a href="'. $useURL .'forgot/confirm_code.php?code='.$code.'&email='.urlencode($user['email']).'"
+                                               target="_blank" 
+                                               style="display: inline-block; padding: 12px 25px; font-size: 16px; color: #ffffff; background-color: #FFC107; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                                                Reset Password
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+    
+                                <p style="margin: 25px 0 15px 0;"><small>This link is valid for one-time use only.</small></p>
+                                <p style="margin: 0;">Thank you,<br><strong>BASC Document</strong></p>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td align="center" style="background-color: #4CAF50; color: #ffffff; padding: 20px; border-top: 1px solid #e0e0e0;">
+                                <p style="margin: 0; font-size: 14px;">Visit us at the Bulacan Agricultural State College</p>
+                            </td>
+                        </tr>
+    
+                    </table>
+                </td>
+            </tr>
+        </table>
+        </div>';
 
+        // Send the email
         $mail->send();
-        
-        // Redirect back to the form with a success message
-        header("Location: forgot.php?status=success");
-        exit();
+        header('Location: forgot.php?status=success'); 
+        exit;
 
     } catch (Exception $e) {
-        // If the email failed to send (e.g., SMTP error)
-        error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
         
-        // Redirect back to the form with an error message
-        header("Location: forgot.php?status=error");
-        exit();
+        header('Location: forgot.php?status=error');
+        // Log the error to the console for debugging
+        error_log("PHPMailer Error: " . $e->getMessage());
+        exit;
     }
-} else {
-    // If the file was accessed directly without POST data
-    header("Location: forgot.php");
-    exit();
+
+    $conn->close();
 }
+?>

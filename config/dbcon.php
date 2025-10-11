@@ -30,8 +30,9 @@
     }
     
     $conn = new mysqli($servername, $username, $password, $dbname);
-    $useURL = "https://appdoc.apxathletix.net/"; // change this part once deployed on hosting for images links e.g https://basc.edu.ph/
+    // $useURL = "https://appdoc.apxathletix.net/"; // change this part once deployed on hosting for images links e.g https://basc.edu.ph/
     
+    $useURL = "http://localhost:3000/"; 
     if ($conn->connect_error) {
       die("Connection failed: " . $conn->connect_error);
     }

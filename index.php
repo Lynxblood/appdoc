@@ -78,7 +78,7 @@
                             </div>
                             <div class="row px-4 py-0 mb-3">
                                 <div class="col py-0">
-                                    <a href="" class="forgotpass normal-theme-text text-theme-green">Forgot Password?</a>
+                                    <a href="forgot/forgot.php" class="forgotpass normal-theme-text text-theme-green">Forgot Password?</a>
                                 </div>
                             </div>
                             <div class="d-grid gap-2 col-6 mx-auto mt-2">
