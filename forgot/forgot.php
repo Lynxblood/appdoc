@@ -186,4 +186,3 @@
 
 </body>
 </html>
-<!-- ALTER TABLE `users` ADD `reset_code` VARCHAR(15) NOT NULL AFTER `signature_base_code`;  -->
