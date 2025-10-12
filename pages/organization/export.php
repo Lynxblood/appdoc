@@ -17,6 +17,7 @@ $fontData = $defaultFontConfig['fontdata'];
 
 try {
     $document_id = $_POST['document_id'] ?? null;
+    $forTableexport = $_POST['forTableexport'] ?? null;
     $logoRight = '../../img/logo/bits.png'; // Default logo path
 
     // Check if a document ID is provided
@@ -96,6 +97,23 @@ try {
 
     $filename = $_POST['filename'] ?? 'page-export.pdf';
     $content  = $_POST['html_content'] ?? '';
+
+    if (empty($content) && !empty($document_id) && $forTableexport) {
+        $stmt_doc = $conn->prepare("SELECT content_html, pdf_filename FROM documents WHERE document_id = ?");
+        $stmt_doc->bind_param("i", $document_id);
+        $stmt_doc->execute();
+        $result_doc = $stmt_doc->get_result();
+        
+        if ($row = $result_doc->fetch_assoc()) {
+            $content = $row['content_html'];
+            // Use saved filename or fallback
+            $filename = $row['pdf_filename'] ?: ('document_' . $document_id . '.pdf');
+        } else {
+            throw new Exception("Document not found for export.");
+        }
+        $stmt_doc->close();
+    }
+
 
    // In pdf_export.php, locate the signature replacement logic
 

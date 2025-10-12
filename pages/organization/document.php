@@ -206,9 +206,11 @@
                                                 }
 
                                                 echo '
-                                                    <li><a class="dropdown-item view-pdf" href="#" data-id="'. $row['document_id'] .'" data-bs-toggle="modal" data-bs-target="#viewPdfApplication">View</a></li>';
+                                                    <li><a class="dropdown-item view-pdf" href="#" data-id="'. $row['document_id'] .'" data-bs-toggle="modal" data-bs-target="#viewPdfApplication">View</a></li>
+                                                    <li><a class="dropdown-item export-pdf" href="#" data-id="'. $row['document_id'] .'">Export</a></li>';
+                                                    
                                                 
-                                                    if (true) {
+                                                    if (($row['status'] == 'revision' || $row['status'] == 'draft') || true) {
                                                         echo '
                                                         <li><a class="dropdown-item edit-pdf" href="#" data-id="'. $row['document_id'] .'">Edit</a></li>
                                                         <li><a class="dropdown-item delete-pdf" data-id="'. $row['document_id'] .'" href="#">Delete</a></li>';
@@ -1270,6 +1272,42 @@ $(document).on("click", ".delete-supporting-doc", function() {
 
 
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.export-pdf').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            const documentId = btn.getAttribute('data-id');
+            if (!documentId) {
+                alert('No document ID found.');
+                return;
+            }
+
+            try {
+                const form = new FormData();
+                form.append('document_id', documentId);
+                form.append('page_size', 'Legal');
+                form.append('forTableexport', true); // default
+
+                const resp = await fetch('export.php', { // adjust path if needed
+                    method: 'POST',
+                    body: form
+                });
+
+                if (!resp.ok) throw new Error('Server returned ' + resp.status);
+
+                const blob = await resp.blob();
+                const filename = `document_${documentId}.pdf`;
+                saveAs(blob, filename); // Requires FileSaver.js
+            } catch (err) {
+                console.error('Export error:', err);
+                alert('Failed to export PDF. Check console for details.');
+            }
+        });
+    });
+});
+
 </script>
 </body>
 </html>

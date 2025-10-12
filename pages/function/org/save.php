@@ -53,12 +53,12 @@ if ($docId) {
         // Update event
         $stmtEvent = $conn->prepare("UPDATE events 
             SET title = ?, description = ?, location = ?, total_expenses = ?, 
-                start_date = ?, end_date = ? 
+                start_date = ?, end_date = ?, updated_at = NOW(), updated_by = ? 
             WHERE event_id = ?");
         $stmtEvent->bind_param(
-            "sssdssi",
+            "sssdssii",
             $event_title, $event_description, $event_location, $event_expenses,
-            $start_datetime, $end_datetime, $event_id
+            $start_datetime, $end_datetime, $user_id, $event_id
         );
         $stmtEvent->execute();
         $stmtEvent->close();
@@ -66,9 +66,9 @@ if ($docId) {
 
     // Update document
     $stmt = $conn->prepare("UPDATE documents 
-        SET pdf_filename = ?, content_html = ?, document_type = ?, updated_at = NOW() 
+        SET pdf_filename = ?, content_html = ?, document_type = ?, updated_at = NOW(), updated_by = ? 
         WHERE document_id = ?");
-    $stmt->bind_param("sssi", $filename, $content_html, $document_type, $docId);
+    $stmt->bind_param("sssii", $filename, $content_html, $document_type, $user_id, $docId);
 
     if ($stmt->execute()) {
         $response["success"] = true;
@@ -82,8 +82,8 @@ if ($docId) {
     // --- INSERT ---
     // Insert into events first
     $stmtEvent = $conn->prepare("INSERT INTO events 
-        (organization_id, title, description, start_date, end_date, location, total_expenses, created_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+        (organization_id, title, description, start_date, end_date, location, total_expenses, created_at, updated_at) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
     $stmtEvent->bind_param(
         "isssssd",
         $organization_id, $event_title, $event_description, $start_datetime, $end_datetime, $event_location, $event_expenses
@@ -100,8 +100,8 @@ if ($docId) {
 
     // Insert into documents with event_id
     $stmt = $conn->prepare("INSERT INTO documents 
-        (pdf_filename, content_html, document_type, user_id, organization_id, event_id, created_at) 
-        VALUES (?, ?, ?, ?, ?, ?, NOW())");
+        (pdf_filename, content_html, document_type, user_id, organization_id, event_id, created_at, updated_at) 
+        VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
     $stmt->bind_param("sssiii", $filename, $content_html, $document_type, $user_id, $organization_id, $event_id);
 
     if ($stmt->execute()) {

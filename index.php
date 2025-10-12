@@ -22,17 +22,17 @@
 <body>
     <div class="container-fluid">
         <div class="row row-main">
-            <div class="col-6 bg-white p-0">
+            <div class="col-md-6 bg-white p-0">
                 <div class="card-left card">
-                    <div class="card-body p-0">
+                    <div class="card-body p-0 overflow-x-hidden">
                         <!-- <div class="card-inner-left card p-0">
                             <div class="card-body"> -->
-                                <div class="row mt-5 pt-5 d-flex justify-content-center align-items-end pe-4">
+                                <div class="mt-0 mt-md-5 p-0 pt-5 row justify-content-center align-items-end pe-md-4">
                                     <img src="img/logo/logo_osas.png" alt="" class="imglogo">
                                     <img src="img/logo/basc_logo.png" alt="" class="imglogo1">
                                     <img src="img/logo/newfssc.png" alt="" class="imglogo">
-                                    <div class="row row1 text-center" >
-                                        <div class="col-12 text-center mt-2 ">
+                                    <div class=" row1 text-center" >
+                                        <div class="col-12 text-center mt-2 p-0">
                                             <h3 class="header-text">Welcome Back!</h3>
                                     <p class="signup-text">We're happy to have you back! This platform is designed to help you and your organization stay organized and efficient. <br><br>If your organization has not been registered yet, please register using the button below.</p>
                                     <!-- <a href="pages/register-account.php" class="register-account-button btn mt-3">Register Org</a> -->
@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col2 col-6 p-0">
+            <div class="col2 col-md-6 p-0">
                 <div class="card-right card bg-white">
                     <div class="card-right-body card-body d-flex justify-content-center align-items-center">
                         <form action="pages/process_login.php" method="post">
@@ -84,7 +84,7 @@
                             <div class="d-grid gap-2 col-6 mx-auto mt-2">
                                 <button class="register-account-button btn mt-3" type="submit" name="login">LOGIN</button>
                             </div>
-                            <div class="col-12 d-flex justify-content-end align-items-end">
+                            <div class="col-md-12 d-flex justify-content-end align-items-end">
                                 <p class="register-text">Don’t have an account yet?  <a href="pages/register.php" class="fw-bold fst-italic normal-theme-text text-theme-green">Sign Up</a> here first.</p>
                             </div>
                         </form>

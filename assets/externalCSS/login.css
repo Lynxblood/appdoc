@@ -175,3 +175,92 @@
     }
   }
   
+
+/* screen less than sm */
+@media (max-width: 576px){
+    .card-left {
+        height: 50vh;
+        border-bottom-left-radius: 30%;
+        border-top-right-radius: 40%;
+        border-bottom-right-radius: 0%;
+        border-top-left-radius: 0%;
+    }
+    .card-right{
+        height: 60vh;
+        border-bottom-left-radius: 30%;
+        border-top-right-radius: 40%;
+        border-bottom-right-radius: 0%;
+        border-top-left-radius: 0%;
+    }
+    
+    .imglogo1{
+        height: 50px;
+        width: 50px;
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 0;
+    }
+    .imglogo{
+        height: 35px;
+        width: 35px;
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 0;
+    }
+    
+    .header-text{
+        font-family: "Special Gothic Expanded One", sans-serif;
+        font-size: 20px;
+        font-weight: 250;
+        padding-top: 10px;
+        color: black;
+    }
+    
+    .signup-text{
+        font-family: "Sansation", sans-serif;
+        font-size: 10px;
+        font-weight: 200;
+        width: 80%;
+        text-align: center;
+
+    }
+    
+    .header-login{
+        font-size: 15px;
+        font-weight: 250;
+        color: black;
+        padding: 0;
+        margin: 0;
+    }
+    .login-text{
+        font-size: 12px;
+        font-weight: 200;
+        font-style: italic;
+        margin: 0 0 10 0;
+        padding: 0;
+
+    }
+    
+    .input-group{
+        width: auto;
+        margin: auto;
+    }
+    .row1{
+        height: auto;
+    }
+  }
+/* sm screen */
+@media (min-width: 576px){
+}
+/* md screen */
+@media (min-width: 768px){
+}
+/* lg screen */
+@media (min-width: 992px){
+}
+/* xl screen */
+@media (min-width: 1200px){
+}
+/* xxl screen */
+@media (min-width: 1400px){
+}
