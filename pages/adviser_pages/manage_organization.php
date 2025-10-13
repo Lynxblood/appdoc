@@ -192,12 +192,12 @@ $ranks_query->close();
                         <div class="mb-3">
                             <label for="logoFile" class="form-label">Select New Logo (JPG, PNG, GIF)</label>
                             <input type="file" class="form-control" id="logoFile" name="logoFile" accept="image/jpeg,image/png,image/gif" required>
-                            <small class="text-muted">This will replace the current logo for **<?php echo htmlspecialchars($organization['name'] ?? 'Your Organization'); ?>**.</small>
+                            <small class="text-muted">This will replace the current logo for "<?php echo htmlspecialchars($organization['name'] ?? 'Your Organization'); ?>".</small>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="submit" class="btn btn-success basc-green-button">Save Changes</button>
                     </div>
                 </form>
             </div>

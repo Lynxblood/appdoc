@@ -48,6 +48,35 @@
   $members_query->bind_param("i", $organization_id);
   $members_query->execute();
   $members_result = $members_query->get_result();
+
+  
+    // ✅ Fixed: Use mysqli syntax for recent activities
+    $sql = "
+        SELECT
+            a.activity_type,
+            a.description,
+            a.created_at,
+            CONCAT(u.first_name, ' ', u.last_name) AS full_name,
+            d.pdf_filename
+        FROM
+            org_recent_activities a
+        JOIN
+            users u ON a.user_id = u.user_id
+        LEFT JOIN
+            documents d ON a.document_id = d.document_id
+        WHERE
+            a.organization_id = ?
+        ORDER BY
+            a.created_at DESC
+        LIMIT 5
+    ";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $organization_id);
+    $stmt->execute();
+    $activities_result = $stmt->get_result();
+    $activities = $activities_result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -177,6 +206,93 @@
                     </tbody>
                 </table>
             </div>
+
+            <div>
+                
+
+            <div class="container-fluid rounded-3 border border-secondary-subtle p-3 my-3 panel  overflow-x-scroll">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h5 class="m-0 font-weight-bold text-center text-success">RECENT ORGANIZATION ACTIVITIES</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+
+                                <?php if (count($activities) > 0): ?>
+                                    
+                                    <?php 
+                                        // Function to determine badge style based on activity type
+                                        function getActivityBadgeClass($type) {
+                                            switch ($type) {
+                                                case 'Document Created':
+                                                    return 'bg-success';
+                                                case 'Document Deleted':
+                                                    return 'bg-danger';
+                                                case 'Document Submitted':
+                                                case 'Document Endorsed':
+                                                case 'Document Approved':
+                                                case 'approved_fssc':
+                                                    return 'bg-primary';
+                                                case 'Document Updated':
+                                                case 'revision':
+                                                    return 'bg-info text-dark';
+                                                case 'Rank Changed':
+                                                    return 'bg-warning text-dark';
+                                                case 'Comment Added':
+                                                    return 'bg-secondary';
+                                                default:
+                                                    return 'bg-light text-dark';
+                                            }
+                                        }
+                                        foreach ($activities as $activity): ?>
+                                        <?php
+
+                                            $formattedDate = formatDateTime($activity['created_at']);
+
+                                            // Get the badge class
+                                            $badgeClass = getActivityBadgeClass($activity['activity_type']);
+                                            
+                                            // Determine context display (Document or User)
+                                            $contextDetail = '';
+                                            if (!empty($activity['pdf_filename'])) {
+                                                $contextDetail = 'Document: "' . htmlspecialchars($activity['pdf_filename']) . '"';
+                                            } else {
+                                                // This is where you might add logic for other activity types like "Rank Changed"
+                                                $contextDetail = "User Action";
+                                            }
+                                        ?>
+                                        
+                                        <a href="document.php" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">
+                                                    <?= htmlspecialchars($activity['full_name']) ?>
+                                                </h6>
+                                                
+                                                <small class="text-muted">
+                                                    <?= $contextDetail ?>
+                                                </small><br>
+                                                
+                                                <span class="badge <?= $badgeClass ?> text-white">
+                                                    <?= htmlspecialchars(ucwords(str_replace('_', ' ', $activity['activity_type']))) ?>
+                                                </span>
+                                                
+                                                <p class="mb-0 text-dark mt-1">
+                                                    "<?= htmlspecialchars($activity['description']) ?>"
+                                                </p>
+                                            </div>
+                                            
+                                            <small class="text-muted"><?= $formattedDate ?></small>
+                                        </a>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="p-3 text-center text-muted">No recent activities found for this organization.</div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
         </div>
         </main>
         
@@ -223,7 +339,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="submit" class="btn btn-success basc-green-button">Save Changes</button>
                     </div>
 				</form>
 				</div>

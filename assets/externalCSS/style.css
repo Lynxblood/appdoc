@@ -495,6 +495,12 @@ body.dark-mode .sidebar a {
   border-radius: 5px;
 }
 
+.dropdown-item.active, .dropdown-item:active {
+  color: white;
+  text-decoration: none;
+  background-color: #355f2e;
+}
+
 
 /* custom buttons classes */
 .basc-green-button{

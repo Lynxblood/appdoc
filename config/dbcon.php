@@ -52,6 +52,11 @@
         }
     }
 
+    //trigger alertify in the start of the website
+    // $_SESSION['message'] = formatDateTime($formattedTime);
+    // $_SESSION['msgtype'] = "success";
+    // $_SESSION['havemsg'] = true;
+
     // function usable around all pages to format raw date
     function formatDate($rawDate) {
         try {
@@ -74,11 +79,6 @@
         }
     }
 
-
-    //trigger alertify in the start of the website
-    // $_SESSION['message'] = formatDateTime($formattedTime);
-    // $_SESSION['msgtype'] = "success";
-    // $_SESSION['havemsg'] = true;
 
     // $sql = "SELECT DISTINCT role FROM users";
     $sql = "SELECT DISTINCT user_role FROM users";

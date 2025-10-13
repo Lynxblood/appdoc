@@ -24,6 +24,16 @@ $docId = isset($_POST['id']) && !empty($_POST['id']) ? intval($_POST['id']) : nu
 $user_id = $_SESSION['user_id']; // Replace with actual logged-in user ID
 $organization_id = $_SESSION['organization_id']; // Replace with actual logged-in user's organization ID
 
+// Fetch user's full name
+$user_name = "Unknown User";
+$userQuery = $conn->prepare("SELECT CONCAT(first_name, ' ', last_name) AS full_name FROM users WHERE user_id = ?");
+$userQuery->bind_param("i", $user_id);
+$userQuery->execute();
+$userQuery->bind_result($user_name);
+$userQuery->fetch();
+$userQuery->close();
+
+
 // Event details
 $event_title = $_POST['event_title'] ?? null;
 $event_description = $_POST['event_description'] ?? null;
@@ -73,6 +83,20 @@ if ($docId) {
     if ($stmt->execute()) {
         $response["success"] = true;
         $response["message"] = "Document & Event updated successfully!";
+
+        // Log to org_recent_activities
+        $activity_type = "Document Updated";
+        $description = "{$user_name} updated document '{$filename}'.";
+        $stmtLog = $conn->prepare("
+            INSERT INTO org_recent_activities 
+            (organization_id, user_id, document_id, activity_type, description, created_at) 
+            VALUES (?, ?, ?, ?, ?, NOW())
+        ");
+        $stmtLog->bind_param("iiiss", $organization_id, $user_id, $docId, $activity_type, $description);
+        $stmtLog->execute();
+        $stmtLog->close();
+
+
     } else {
         $response["message"] = "Update failed: " . $stmt->error;
     }
@@ -108,6 +132,20 @@ if ($docId) {
         $docId = $conn->insert_id; // Get the new document_id
         $response["success"] = true;
         $response["message"] = "New document & event created successfully!";
+
+        // Log to org_recent_activities
+        $activity_type = "Document Created";
+        $description = "{$user_name} created document '{$filename}'.";
+        $stmtLog = $conn->prepare("
+            INSERT INTO org_recent_activities 
+            (organization_id, user_id, document_id, activity_type, description, created_at) 
+            VALUES (?, ?, ?, ?, ?, NOW())
+        ");
+        $stmtLog->bind_param("iiiss", $organization_id, $user_id, $docId, $activity_type, $description);
+        $stmtLog->execute();
+        $stmtLog->close();
+
+
     } else {
         $response["message"] = "Document insertion failed: " . $stmt->error;
     }

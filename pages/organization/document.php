@@ -1,3 +1,5 @@
+<?php
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -124,24 +126,29 @@
 		.comment-form button {
 			margin-left: .5rem;
 		}
+
+
+
   </style>
 </head>
 <?php
-  require '../../config/dbcon.php';
-  
-  
-    if(!empty($_SESSION['user_role'])){
+
+    require '../../config/dbcon.php';
+    
+    if (!empty($_SESSION['user_role'])) {
         $excludedValues = ["academic_organization", "non_academic_organization"];
         $filteredArray = array_diff($allroles, $excludedValues);
 
         if (in_array($_SESSION['user_role'], $filteredArray)) {
             header('location: ../../config/redirect.php');
         }
-    }else{
+    } else {
         header("location: ../logout.php");
     }
-    
+
     $user_id = $_SESSION['user_id'];
+
+    // Get organization_id
     $organization_id_query = $conn->prepare("SELECT organization_id FROM users WHERE user_id = ?");
     $organization_id_query->bind_param("i", $user_id);
     $organization_id_query->execute();
@@ -149,10 +156,28 @@
     $organization_id = $organization_id_result->fetch_assoc()['organization_id'];
     $organization_id_query->close();
 
-    $documents_query = $conn->prepare("SELECT document_id, status, document_type, pdf_filename, created_at FROM documents WHERE organization_id = ? AND user_id= ? ORDER BY created_at DESC");
+    // Get user’s documents
+    $documents_query = $conn->prepare("
+        SELECT document_id, status, document_type, pdf_filename, created_at 
+        FROM documents 
+        WHERE organization_id = ? AND user_id = ? 
+        ORDER BY created_at DESC
+    ");
     $documents_query->bind_param("ii", $organization_id, $user_id);
     $documents_query->execute();
     $documents_result = $documents_query->get_result();
+
+    
+    // Get current user's rank
+    $user_info_sql = "SELECT rank_id FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($user_info_sql);
+    $stmt->bind_param("i", $current_user_id);
+    $stmt->execute();
+    $user_info = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    $is_president = ($user_info && $user_info['rank_id'] == 5);
+
 ?>
 <body>
         <?php
@@ -161,71 +186,101 @@
         ?>
         <div class="container-fluid">
 				<div class="container-fluid rounded-3 border border-secondary-subtle p-3 my-3 overflow-x-scroll">
-					<div class="d-flex justify-content-between align-items-center px-2">
-						<h4>Letter request</h4>
-						<button id="newApplicationButton" data-bs-toggle="modal" data-bs-target="#newApplication" type="button" class="basc-green-button btn btn-success d-flex justify-content-center align-items-center">
-							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-								<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-							</svg>&nbsp;New application
-						</button>
-					</div>
-					<table id="myTable" class="table table-striped text-start">
-						<thead>
-							<tr>
-								<th>Application </th>
-								<th>Filename</th>
-								<th>Status</th>
-								<th>Date created</th>
-								<th>Action</th>
-							</tr>
-						</thead>
-						<tbody >
-                        <?php
-                            $sql = "SELECT * FROM documents WHERE organization_id = '" . $_SESSION['organization_id'] . "'";
-                            $result = $conn->query($sql);
+                    <div>
 
-                            if ($result->num_rows > 0) {
-                                while ($row = $result->fetch_assoc()) {
-                                    echo "<tr>";
-                                    echo "<td>" . $row["document_id"] . "</td>";
-                                    echo "<td>" . $row["pdf_filename"] . "</td>";
-                                    echo "<td>" . $row["status"] . "</td>";
-                                    echo "<td>" . formatDateTime($row["created_at"]) . "</td>";
-                                    echo '<td>
-                                            <div class="btn-group dropstart">
-                                                <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-                                                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                                                    </svg>
-                                                </button>
-                                                <ul class="dropdown-menu">';
-                                                
-                                                // Show submit only if not revision or draft
-                                                if ($row['status'] == 'revision' || $row['status'] == 'draft') {
-                                                    echo '<li><a class="dropdown-item submit-pdf" href="#" data-id="'. $row['document_id'] .'">Submit</a></li>';
-                                                }
+                        <div class="d-flex justify-content-between align-items-center px-2">
+                            <h4>Letter request</h4>
+                            <button id="newApplicationButton" data-bs-toggle="modal" data-bs-target="#newApplication" type="button" class="basc-green-button btn btn-success d-flex justify-content-center align-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                                </svg>&nbsp;New application
+                            </button>
+                        </div>
+                        <table id="myTable" class="table table-striped text-start">
+                            <thead>
+                                <tr>
+                                    <th>Application </th>
+                                    <th>Filename</th>
+                                    <th>Status</th>
+                                    <th>Date created</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                // ✅ Get current user details once
+                                $current_user_id = $_SESSION['user_id'];
+                                $current_org_id = $_SESSION['organization_id'];
 
-                                                echo '
-                                                    <li><a class="dropdown-item view-pdf" href="#" data-id="'. $row['document_id'] .'" data-bs-toggle="modal" data-bs-target="#viewPdfApplication">View</a></li>
-                                                    <li><a class="dropdown-item export-pdf" href="#" data-id="'. $row['document_id'] .'">Export</a></li>';
-                                                    
-                                                
-                                                    if (($row['status'] == 'revision' || $row['status'] == 'draft') || true) {
-                                                        echo '
-                                                        <li><a class="dropdown-item edit-pdf" href="#" data-id="'. $row['document_id'] .'">Edit</a></li>
-                                                        <li><a class="dropdown-item delete-pdf" data-id="'. $row['document_id'] .'" href="#">Delete</a></li>';
-                                                    }
-                                                echo'
-                                                </ul>	
-                                            </div>
-                                        </td>';
-                                    echo "</tr>";
+                                // Check if current user is president (rank_id = 5)
+                                $user_check = $conn->prepare("SELECT rank_id FROM users WHERE user_id = ?");
+                                $user_check->bind_param("i", $current_user_id);
+                                $user_check->execute();
+                                $user_info = $user_check->get_result()->fetch_assoc();
+                                $user_check->close();
+
+                                $is_president = ($user_info && $user_info['rank_id'] == 5);
+
+                                // ✅ Fetch all documents for this organization
+                                $sql = "SELECT * FROM documents WHERE organization_id = ? AND is_archived = 0";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->bind_param("i", $current_org_id);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+
+                                if ($result->num_rows > 0) {
+                                    while ($row = $result->fetch_assoc()) {
+                                        $document_id = $row['document_id'];
+
+                                        // ✅ Check if current user has edit access
+                                        $access_stmt = $conn->prepare("SELECT access_level FROM document_access WHERE document_id = ? AND user_id = ?");
+                                        $access_stmt->bind_param("ii", $document_id, $current_user_id);
+                                        $access_stmt->execute();
+                                        $access_data = $access_stmt->get_result()->fetch_assoc();
+                                        $access_stmt->close();
+
+                                        $has_edit_access = ($access_data && $access_data['access_level'] === 'edit');
+
+                                        ?>
+                                        <tr>
+                                            <td><?= $row['document_id']; ?></td>
+                                            <td><?= htmlspecialchars($row['pdf_filename']); ?></td>
+                                            <td><?= htmlspecialchars($row['status']); ?></td>
+                                            <td><?= formatDateTime($row['created_at']); ?></td>
+                                            <td>
+                                                <div class="btn-group dropstart">
+                                                    <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                                                        </svg>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <!-- Always available -->
+                                                        <li><a class="dropdown-item view-pdf" href="#" data-id="<?= $document_id; ?>" data-bs-toggle="modal" data-bs-target="#viewPdfApplication">View</a></li>
+                                                        <li><a class="dropdown-item export-pdf" href="#" data-id="<?= $document_id; ?>">Export</a></li>
+
+                                                        <!-- Only for President -->
+                                                        <?php if ($is_president): ?>
+                                                            <li><a class="dropdown-item grant-access" href="#" data-id="<?= $document_id; ?>" data-bs-toggle="modal" data-bs-target="#grantAccessModal">Grant Access</a></li>
+                                                        <?php endif; ?>
+
+                                                        <!-- Only show Edit/Delete if user has edit access or owns document -->
+                                                        <?php if ($has_edit_access || $row['user_id'] == $current_user_id): ?>
+                                                            <li><a class="dropdown-item edit-pdf" href="#" data-id="<?= $document_id; ?>">Edit</a></li>
+                                                            <li><a class="dropdown-item delete-pdf" href="#" data-id="<?= $document_id; ?>">Delete</a></li>
+                                                        <?php endif; ?>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <?php
+                                    }
                                 }
-                            }
-                            ?>
-
-						</tbody>
-					</table>
+                                $stmt->close();
+                                ?>
+                                </tbody>
+                        </table>
+                    </div>
 				</div>
 			</div>
 		</main>
@@ -480,7 +535,42 @@
 				</div>
 			</div>
 		</div>
-		
+
+        <div class="modal fade" id="grantAccessModal" tabindex="-1" aria-labelledby="grantAccessModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="grantAccessModalLabel">Grant Access</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                <form id="grantAccessForm">
+                    <input type="hidden" name="document_id" id="grant_document_id">
+
+                    <div class="mb-3">
+                        <label for="user_to_grant_id" class="form-label">Select Member</label>
+                        <select name="user_to_grant_id" id="user_to_grant_id" class="form-select" required>
+                        <option value="">Loading members...</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="access_level" class="form-label">Access Level</label>
+                        <select name="access_level" id="access_level" class="form-select" required>
+                        <option value="view">View Only</option>
+                        <option value="edit">Edit</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success basc-green-button">Grant Access</button>
+                </div>
+                </form>
+                </div>
+            </div>
+        </div>
+
 		<div class="modal fade" id="viewPdfApplication" tabindex="-1" aria-labelledby="viewPdfApplicationLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-scrollable modal-fullscreen">
 				<div class="modal-content">
@@ -521,7 +611,8 @@
         </div>
 
         
-		</div>
+	</div>
+    
     <script src="../../assets/jquery/jquery-3.7.1.min.js"></script> <script src="../../assets/externalJS/script.js"></script>
 	<script	script src="../../assets/datatables/dataTables.min.js"></script> <script	script src="../../assets/datatables/dataTables.bootstrap5.js"></script> <script src="../../assets/js/bootstrap.bundle.min.js"></script>
     <script src="../../../assets/js/date-fns.js"></script>
@@ -1079,7 +1170,7 @@ $("#editorForm").on("submit", function(e) {
 				function() { // Cancel button callback
 					alertify.error('Delete cancelled');
 				}
-			);
+			).set('reverseButtons', true);
 		});
         // Add this new function to handle the template selection
         $('#templateSelect').on('change', function() {
@@ -1308,6 +1399,96 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  // When "Grant Access" is clicked
+  document.querySelectorAll('.grant-access').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const documentId = btn.dataset.id;
+      document.getElementById('grant_document_id').value = documentId;
+
+      // Fetch members via AJAX
+      fetch('../function/org/get_org_members.php?document_id=' + documentId)
+        .then(response => response.json())
+        .then(data => {
+          const select = document.getElementById('user_to_grant_id');
+          select.innerHTML = ''; // clear old options
+
+          if (data.length === 0) {
+            select.innerHTML = '<option value="">No available members</option>';
+            return;
+          }
+
+          data.forEach(member => {
+            const option = document.createElement('option');
+            option.value = member.user_id;
+            option.textContent = `${member.first_name} ${member.last_name}`;
+            select.appendChild(option);
+          });
+        })
+        .catch(error => {
+          console.error('Error loading members:', error);
+          alertify.error('Failed to load members.');
+        });
+    });
+  });
+
+  // Handle form submit (grant access)
+  document.getElementById('grantAccessForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    fetch('../function/org/grant_access.php', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        alertify.success(data.message);
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        alertify.error(data.message);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alertify.error('Something went wrong.');
+    });
+  });
+});
 </script>
+
+<style>
+    
+    .alertify .ajs-footer .ajs-buttons .ajs-ok {
+            background-color: #355f2e;
+            border: 1px solid #355f2e;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .alertify .ajs-footer .ajs-buttons .ajs-ok:hover {
+            background-color: #198754; /* darker green hover */
+            border-color: #198754;
+        }
+
+        .alertify .ajs-footer .ajs-buttons .ajs-cancel {
+            background-color: #6c757d;
+            border: 1px solid #6c757d;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .alertify .ajs-footer .ajs-buttons .ajs-cancel:hover {
+            background-color: #5c636a;
+            border-color: #565e64;
+        }
+</style>
 </body>
 </html>
