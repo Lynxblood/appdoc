@@ -153,6 +153,28 @@
     $documents_query->bind_param("ii", $organization_id, $user_id);
     $documents_query->execute();
     $documents_result = $documents_query->get_result();
+
+    $current_org_id = $_SESSION['organization_id'];
+
+    $sql = "SELECT DISTINCT e.event_id, e.title, e.description, e.start_date, e.end_date, e.location, e.total_expenses
+    FROM events e
+    INNER JOIN documents d ON e.event_id = d.event_id
+    WHERE e.organization_id = ?
+      AND e.end_date < NOW()
+      AND d.status = 'approved_fssc'
+    ORDER BY e.end_date DESC
+    LIMIT 5
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $current_org_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $past_events = [];
+    while ($row = $result->fetch_assoc()) {
+        $past_events[] = $row;
+    }
+    $stmt->close();
 ?>
 <body>
         <?php
@@ -190,7 +212,78 @@
                         </ol>
                     </div>
                 </div>
+                
+
+                <div class="p-2">
+                    <div class="row">
+                        <div class="col-12">
+                            <h3 class="mb-4">
+                                <i class='bx bxs-calendar-check'></i> Latest Past Events
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                        <?php if (count($past_events) > 0): ?>
+                            <?php foreach ($past_events as $event): ?>
+                                <div class="col">
+                                    <div class="card h-100 shadow-sm border-0">
+                                        <div class="card-header bg-success text-white">
+                                            <h5 class="card-title mb-0"><?php echo htmlspecialchars($event['title']); ?></h5>
+                                            <small>Event ID: <?php echo $event['event_id']; ?></small>
+                                        </div>
+                                        
+                                        <div class="card-body d-flex flex-column">
+                                            <p class="card-text text-muted small">
+                                                <?php 
+                                                    // Truncate description for card view
+                                                    $desc = htmlspecialchars($event['description']);
+                                                    echo (strlen($desc) > 100) ? substr($desc, 0, 100) . '...' : $desc; 
+                                                ?>
+                                            </p>
+                                            
+                                            <ul class="list-group list-group-flush mt-auto">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class='bx bxs-calendar-alt me-2 text-info'></i>
+                                                        <strong>Date:</strong>
+                                                    </div>
+                                                    <span><?php echo date('M j, Y', strtotime($event['start_date'])); ?></span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class='bx bxs-map me-2 text-danger'></i>
+                                                        <strong>Location:</strong>
+                                                    </div>
+                                                    <span><?php echo htmlspecialchars($event['location']); ?></span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class='bx bxs-dollar-circle me-2 text-success'></i>
+                                                        <strong>Expenses:</strong>
+                                                    </div>
+                                                    <span>₱ <?php echo number_format($event['total_expenses'], 2); ?></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="card-footer bg-light border-0">
+                                            <a href="view_event.php?event_id=<?php echo $event['event_id']; ?>" class="btn btn-sm btn-outline-success w-100">View Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="col-12">
+                                <div class="alert alert-info" role="alert">
+                                    No past events found for your organization.
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
 			</div>
+
 		</main>
 
         <!-- Modal -->
