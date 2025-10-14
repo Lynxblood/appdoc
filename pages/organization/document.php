@@ -190,11 +190,31 @@
 
                         <div class="d-flex justify-content-between align-items-center px-2">
                             <h4>Letter request</h4>
-                            <button id="newApplicationButton" data-bs-toggle="modal" data-bs-target="#newApplication" type="button" class="basc-green-button btn btn-success d-flex justify-content-center align-items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                                </svg>&nbsp;New application
-                            </button>
+                            <?php 
+                            
+                            // ✅ Get current user details once
+                            $current_user_id = $_SESSION['user_id'];
+                            $current_org_id = $_SESSION['organization_id'];
+
+                            // Check if current user is president (rank_id = 5)
+                            $user_check = $conn->prepare("SELECT rank_id FROM users WHERE user_id = ?");
+                            $user_check->bind_param("i", $current_user_id);
+                            $user_check->execute();
+                            $user_info = $user_check->get_result()->fetch_assoc();
+                            $user_check->close();
+
+                            $is_president = ($user_info && $user_info['rank_id'] == 5);
+
+                            if ($is_president == true) {
+                            ?>
+                                <button id="newApplicationButton" data-bs-toggle="modal" data-bs-target="#newApplication" type="button" class="basc-green-button btn btn-success d-flex justify-content-center align-items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                                    </svg>&nbsp;New application
+                                </button>
+                            <?php
+                            }
+                            ?>
                         </div>
                         <table id="myTable" class="table table-striped text-start">
                             <thead>
@@ -202,6 +222,7 @@
                                     <th>Application </th>
                                     <th>Filename</th>
                                     <th>Status</th>
+                                    <th>Created By</th>
                                     <th>Date created</th>
                                     <th>Action</th>
                                 </tr>
@@ -222,7 +243,13 @@
                                 $is_president = ($user_info && $user_info['rank_id'] == 5);
 
                                 // ✅ Fetch all documents for this organization
-                                $sql = "SELECT * FROM documents WHERE organization_id = ? AND is_archived = 0";
+                                $sql = "
+                                    SELECT d.*, u.first_name AS creator_name
+                                    FROM documents d
+                                    LEFT JOIN users u ON d.user_id = u.user_id
+                                    WHERE d.organization_id = ? AND d.is_archived = 0
+                                ";
+
                                 $stmt = $conn->prepare($sql);
                                 $stmt->bind_param("i", $current_org_id);
                                 $stmt->execute();
@@ -246,6 +273,7 @@
                                             <td><?= $row['document_id']; ?></td>
                                             <td><?= htmlspecialchars($row['pdf_filename']); ?></td>
                                             <td><?= htmlspecialchars($row['status']); ?></td>
+                                            <td><?= htmlspecialchars($row['creator_name'] ?? 'Unknown'); ?></td>
                                             <td><?= formatDateTime($row['created_at']); ?></td>
                                             <td>
                                                 <div class="btn-group dropstart">
@@ -265,7 +293,7 @@
                                                         <?php endif; ?>
 
                                                         <!-- Only show Edit/Delete if user has edit access or owns document -->
-                                                        <?php if ($has_edit_access || $row['user_id'] == $current_user_id): ?>
+                                                        <?php if ($has_edit_access || $row['user_id'] == $current_user_id || $is_president): ?>
                                                             <li><a class="dropdown-item edit-pdf" href="#" data-id="<?= $document_id; ?>">Edit</a></li>
                                                             <li><a class="dropdown-item delete-pdf" href="#" data-id="<?= $document_id; ?>">Delete</a></li>
                                                         <?php endif; ?>

@@ -35,7 +35,7 @@
   $org_details = [];
   if ($organization_id) {
       // CORRECTED QUERY: Using only 'name' and 'type' from 'organizations' table
-      $org_query = $conn->prepare("SELECT o.name, o.type, r.rank_name FROM organizations o JOIN organization_ranks r ON o.rank_id = r.rank_id WHERE organization_id = ?");
+      $org_query = $conn->prepare("SELECT o.name, o.type FROM organizations o  WHERE organization_id = ?");
       $org_query->bind_param("i", $organization_id);
       $org_query->execute();
       $org_result = $org_query->get_result();

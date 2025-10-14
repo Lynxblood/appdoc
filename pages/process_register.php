@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // --- End of Modified Code ---
 
-    $sql_insert = "INSERT INTO users (first_name, last_name, email, password_hash, user_role, organization_id, signature_base_code) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $sql_insert = "INSERT INTO users (first_name, last_name, email, password_hash, user_role, organization_id, signature_base_code, rank_id) VALUES (?, ?, ?, ?, ?, ?, ?, 1)";
     $stmt_insert = $conn->prepare($sql_insert);
     if ($stmt_insert === false) {
         $_SESSION['message'] = 'Error preparing statement:' . $conn->error;
