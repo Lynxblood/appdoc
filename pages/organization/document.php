@@ -1357,7 +1357,7 @@ $(document).on("click", ".delete-supporting-doc", function() {
             // ❌ User clicked Cancel
             alertify.error("Delete cancelled");
         }
-    ).set('labels', {ok:'Yes', cancel:'No'});
+    ).set('labels', {ok:'Yes', cancel:'No'}).set('reverseButtons', true);
 });
 
 

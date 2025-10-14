@@ -163,3 +163,23 @@ updateDateTime();
 // Update every second
 setInterval(updateDateTime, 1000);
 
+
+// Helper function to get the appropriate Boxicon based on MIME type or file extension
+function getFileIcon(fileNameOrMimeType) {
+  const nameLower = fileNameOrMimeType.toLowerCase();
+  
+  if (nameLower.includes('pdf')) {
+      return { icon: 'bxs-file-pdf', color: 'text-danger' };
+  }
+  if (nameLower.includes('image') || nameLower.endsWith('.png') || nameLower.endsWith('.jpg') || nameLower.endsWith('.jpeg')) {
+      return { icon: 'bxs-file-image', color: 'text-primary' };
+  }
+  if (nameLower.endsWith('.doc') || nameLower.endsWith('.docx')) {
+      return { icon: 'bxs-file-doc', color: 'text-info' };
+  }
+  if (nameLower.endsWith('.xls') || nameLower.endsWith('.xlsx')) {
+      return { icon: 'bxs-spreadsheet', color: 'text-success' };
+  }
+  // Default for other file types
+  return { icon: 'bxs-file', color: 'text-secondary' };
+}
