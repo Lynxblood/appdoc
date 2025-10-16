@@ -663,13 +663,13 @@
                                         
                                         
                                         <h4 class="fw-bold">Document</h4>
+                                            <div class="d-flex align-items-center border-bottom mb-3 pt-2">
+                                                <label class="me-2 fw-semibold">File Name:</label>
+                                                <input id="filenameInput" name="filename" value="page-export.pdf" class="filename-input">
+                                            </div>
                                         <textarea name="editorContent" id="editorContent" hidden></textarea>
                                         <div id="editor" contenteditable="true">
 
-                                        </div>
-                                        <div class="d-flex align-items-center border-bottom mt-3 pt-2">
-                                            <label class="me-2 fw-semibold">File Name:</label>
-                                            <input id="filenameInput" name="filename" value="page-export.pdf" class="filename-input">
                                         </div>
                                     </div>
                                 </div>

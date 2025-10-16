@@ -101,6 +101,17 @@
 													</p>";
 												break;
 
+											case 'admin':
+												$logo_path = "../../img/logo/org-logo.png";
+												$text_to_display = "
+													<p class='p-text m-0' style='font-size: 20px;'>
+														<span class='span-text' style='color: yellow; font-size: 25px;'>A</span>dmin 
+													</p>
+													<p class='p-text m-0' style='font-size: 20px;'>
+														<span class='span-text' style='color: yellow; font-size: 25px;'>O</span>ffice
+													</p>";
+												break;
+
 											default:
 												$logo_path = "../../img/logo/default_logo.png";
 												$role_text = ucwords(str_replace('_', ' ', $user_role));
@@ -312,7 +323,45 @@
 							</a>
 	
 						<?php
-						}?>
+						}elseif ($_SESSION['user_role'] == 'admin') {
+							?>
+								<a href="dashboard.php" class="sidebar-link text-decoration-none px-3 py-1">
+									<i class="fas fa-home me-2 "></i>
+									<span class="hide-on-collapse">Dashboard</span>
+		
+								</a>
+								<!-- <hr class="hr p-0 m-0 ">
+		
+								<a href="profile-adviser.php" class="sidebar-link  text-decoration-none px-3 py-1">
+								<i class="fas fa-users me-2"></i>
+									<span class="hide-on-collapse">Organization</span>
+		
+								</a> -->
+								
+								<hr class="hr p-0 m-0 ">
+							
+						
+								<a href="request.php" class="sidebar-link text-decoration-none px-3 py-1">
+									<i class="fa-solid fa-file-lines me-3"></i>
+									<span class="hide-on-collapse">Admin</span>
+								</a>
+								
+								<hr class="hr p-0 m-0 ">
+								
+								
+								<a href="calendar.php" class="sidebar-link text-decoration-none px-3 py-1">
+								<i class="fas fa-calendar-alt me-3"></i>
+									<span class="hide-on-collapse">Events</span>
+								</a>
+								
+								<hr class="hr p-0 m-0 ">
+								<a href="settings.php" class="sidebar-link  text-decoration-none px-3 py-1">
+									<i class="fas fa-gear me-3"></i>
+									<span class="hide-on-collapse">Settings</span>
+								</a>
+		
+							<?php
+							}?>
 					
 				</div>
 			</div>

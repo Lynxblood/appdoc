@@ -293,9 +293,14 @@
                                                         <?php endif; ?>
 
                                                         <!-- Only show Edit/Delete if user has edit access or owns document -->
+                                                        
                                                         <?php if ($has_edit_access || $row['user_id'] == $current_user_id || $is_president): ?>
                                                             <li><a class="dropdown-item edit-pdf" href="#" data-id="<?= $document_id; ?>">Edit</a></li>
                                                             <li><a class="dropdown-item delete-pdf" href="#" data-id="<?= $document_id; ?>">Delete</a></li>
+
+                                                            <?php if ($row['status'] == 'revision' || $row['status'] == 'draft'): ?>
+                                                                <li><a class="dropdown-item submit-pdf" href="#" data-id="<?= $row['document_id']; ?>">Submit</a></li>
+                                                            <?php endif; ?>
                                                         <?php endif; ?>
                                                     </ul>
                                                 </div>
@@ -542,13 +547,13 @@
                                             
                                             
                                             <h4 class="fw-bold">Document</h4>
+                                            <div class="d-flex align-items-center border-bottom mb-3 pt-2">
+                                                <label class="me-2 fw-semibold">File Name:</label>
+                                                <input id="filenameInput" name="filename" value="page-export.pdf" class="filename-input">
+                                            </div>
                                             <textarea name="editorContent" id="editorContent" hidden></textarea>
                                             <div id="editor" contenteditable="true">
 
-                                            </div>
-                                            <div class="d-flex align-items-center border-bottom mt-3 pt-2">
-                                                <label class="me-2 fw-semibold">File Name:</label>
-                                                <input id="filenameInput" name="filename" value="page-export.pdf" class="filename-input">
                                             </div>
                                         </div>
                                     </div>
@@ -861,16 +866,17 @@
             }
         });
 
-
-		document.getElementById('newApplicationButton').addEventListener('click', () => {
-            // Reset the modal for a new application
-            $("#documentId").val(""); // Clear the hidden ID field
-            $("#filenameInput").val(""); // Clear the filename
-            document.getElementById('newApplicationLabel').innerHTML = "Create new document";
-            document.getElementById('viewCommentBtn').classList.add('d-none');
-			editor.innerHTML = '<h1>Your page title</h1><p>Start writing your page here.</p>';
-			document.getElementById('loadCallout').innerHTML = '<div class="alert alert-info alert-dismissible fade show border-5 border-top-0 border-bottom-0 border-end-0 rounded-0" role="alert"><h5>Instructions:</h5><p>Create your document below. To include an e-signature for the approver, type <strong>[ADVISER_SIGNATURE], [DEAN_SIGNATURE], and [FSSC_SIGNATURE]</strong> exactly where you want it to appear.</p><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-		});
+        if(document.getElementById('newApplicationButton')){
+            document.getElementById('newApplicationButton').addEventListener('click', () => {
+                // Reset the modal for a new application
+                $("#documentId").val(""); // Clear the hidden ID field
+                $("#filenameInput").val(""); // Clear the filename
+                document.getElementById('newApplicationLabel').innerHTML = "Create new document";
+                document.getElementById('viewCommentBtn').classList.add('d-none');
+                editor.innerHTML = '<h1>Your page title</h1><p>Start writing your page here.</p>';
+                document.getElementById('loadCallout').innerHTML = '<div class="alert alert-info alert-dismissible fade show border-5 border-top-0 border-bottom-0 border-end-0 rounded-0" role="alert"><h5>Instructions:</h5><p>Create your document below. To include an e-signature for the approver, type <strong>[ADVISER_SIGNATURE], [DEAN_SIGNATURE], and [FSSC_SIGNATURE]</strong> exactly where you want it to appear.</p><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+            });
+        }
         document.getElementById('clearBtn').addEventListener('click', () => {
             if (confirm('Clear the editor?')) editor.innerHTML = '<h1>Your page title</h1><p>Start writing your page here.</p>';
         });
@@ -1017,105 +1023,106 @@
 			xhr.send("id=" + encodeURIComponent(id) + "&status=submitted"); 
 			});
 		});
-		});
 		// sample
 		$(document).on("click", ".edit-pdf", function(e) {
-    e.preventDefault();
-    document.getElementById('newApplicationLabel').innerHTML = "Edit Document";
-    document.getElementById('viewCommentBtn').classList.remove('d-none');
-    let docId = $(this).data("id");
+            e.preventDefault();
+            document.getElementById('newApplicationLabel').innerHTML = "Edit Document";
+            document.getElementById('viewCommentBtn').classList.remove('d-none');
+            let docId = $(this).data("id");
 
-    $.post("../function/org/get_document.php", { id: docId }, function(data) {
-        if (data.success) {
-            // Load document content
-            $("#documentViewer").html(data.content_html);
-            $("#filenameInput").val(data.filename);
-            $("#editor").html(data.content_html);
-            $("#documentId").val(docId);
+            $.post("../function/org/get_document.php", { id: docId }, function(data) {
+                if (data.success) {
+                    // Load document content
+                    $("#documentViewer").html(data.content_html);
+                    $("#filenameInput").val(data.filename);
+                    $("#editor").html(data.content_html);
+                    $("#documentId").val(docId);
 
-            // Load event fields if event exists
-            if (data.event) {
-                $("#eventTitle").val(data.event.title);
-                $("#eventDescription").val(data.event.description);
-                $("#eventLocation").val(data.event.location);
-                $("#eventExpenses").val(data.event.total_expenses);
+                    // Load event fields if event exists
+                    if (data.event) {
+                        $("#eventTitle").val(data.event.title);
+                        $("#eventDescription").val(data.event.description);
+                        $("#eventLocation").val(data.event.location);
+                        $("#eventExpenses").val(data.event.total_expenses);
 
-                // Handle start_date (split into date + time)
-                if (data.event.start_date) {
-                    let start = new Date(data.event.start_date);
-                    $("#startDateInput").val(start.toISOString().split("T")[0]);
-                    $("#fromTime").val(start.toTimeString().slice(0,5));
+                        // Handle start_date (split into date + time)
+                        if (data.event.start_date) {
+                            let start = new Date(data.event.start_date);
+                            $("#startDateInput").val(start.toISOString().split("T")[0]);
+                            $("#fromTime").val(start.toTimeString().slice(0,5));
+                        }
+
+                        // Handle end_date (split into date + time)
+                        if (data.event.end_date) {
+                            let end = new Date(data.event.end_date);
+                            $("#endDateInput").val(end.toISOString().split("T")[0]);
+                            $("#toTime").val(end.toTimeString().slice(0,5));
+                        }
+                    } else {
+                        // Clear event fields if no event found
+                        $("#eventTitle").val("");
+                        $("#eventDescription").val("");
+                        $("#eventLocation").val("");
+                        $("#eventExpenses").val("");
+                        $("#startDateInput").val("");
+                        $("#fromTime").val("09:00");
+                        $("#endDateInput").val("");
+                        $("#toTime").val("17:00");
+                    }
+
+                    // Load comments
+                    $("#commentsContainer").empty();
+                    if (data.comments.length > 0) {
+                        data.comments.forEach(comment => {
+                            $("#commentsContainer").append(`
+                                <div class="comment-item">
+                                    <strong>${comment.first_name} ${comment.last_name}</strong>
+                                    <p>${comment.comment_text}</p>
+                                    <small class="text-muted">${formatDateTime(comment.created_at)}</small>
+                                </div>
+                            `);
+                        });
+                    } else {
+                        $("#commentsContainer").append('<p class="text-center text-muted mt-4">No comments yet.</p>');
+                    }
+                    // Clear old supporting docs
+                    $("#existingDocumentsList").empty();
+
+                    if (data.supporting_docs && data.supporting_docs.length > 0) {
+                        data.supporting_docs.forEach(doc => {
+                            $("#existingDocumentsList").append(`
+                                <div class="d-flex align-items-center mb-2 p-2 border rounded">
+                                    <i class='bx bxs-file-pdf text-danger fs-4 me-2'></i>
+                                    <span class="flex-grow-1 text-truncate">${doc.file_name}</span>
+                                    <a href="${doc.file_path}" target="_blank" class="btn btn-sm btn-primary ms-2">View</a>
+                                    <button type="button" class="btn btn-sm btn-danger ms-2 delete-supporting-doc" data-id="${doc.id}">
+                                        Delete
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    } else {
+                        $("#existingDocumentsList").append('<p class="text-muted">No supporting documents uploaded.</p>');
+                    }
+
+
+                    $("#commentDocumentId").val(docId);
+                    $("#newApplication").modal("show");
+                } else {
+                    alertify.error(data.message || "Failed to load document");
                 }
+            }, "json");
 
-                // Handle end_date (split into date + time)
-                if (data.event.end_date) {
-                    let end = new Date(data.event.end_date);
-                    $("#endDateInput").val(end.toISOString().split("T")[0]);
-                    $("#toTime").val(end.toTimeString().slice(0,5));
-                }
-            } else {
-                // Clear event fields if no event found
-                $("#eventTitle").val("");
-                $("#eventDescription").val("");
-                $("#eventLocation").val("");
-                $("#eventExpenses").val("");
-                $("#startDateInput").val("");
-                $("#fromTime").val("09:00");
-                $("#endDateInput").val("");
-                $("#toTime").val("17:00");
-            }
+            // Clear and set loading for history dropdown
+            $('#documentHistory').html('<option>Loading...</option>');
 
-            // Load comments
-            $("#commentsContainer").empty();
-            if (data.comments.length > 0) {
-                data.comments.forEach(comment => {
-                    $("#commentsContainer").append(`
-                        <div class="comment-item">
-                            <strong>${comment.first_name} ${comment.last_name}</strong>
-                            <p>${comment.comment_text}</p>
-                            <small class="text-muted">${formatDateTime(comment.created_at)}</small>
-                        </div>
-                    `);
-                });
-            } else {
-                $("#commentsContainer").append('<p class="text-center text-muted mt-4">No comments yet.</p>');
-            }
-            // Clear old supporting docs
-            $("#existingDocumentsList").empty();
-
-            if (data.supporting_docs && data.supporting_docs.length > 0) {
-                data.supporting_docs.forEach(doc => {
-                    $("#existingDocumentsList").append(`
-                        <div class="d-flex align-items-center mb-2 p-2 border rounded">
-                            <i class='bx bxs-file-pdf text-danger fs-4 me-2'></i>
-                            <span class="flex-grow-1 text-truncate">${doc.file_name}</span>
-                            <a href="${doc.file_path}" target="_blank" class="btn btn-sm btn-primary ms-2">View</a>
-                            <button type="button" class="btn btn-sm btn-danger ms-2 delete-supporting-doc" data-id="${doc.id}">
-                                Delete
-                            </button>
-                        </div>
-                    `);
-                });
-            } else {
-                $("#existingDocumentsList").append('<p class="text-muted">No supporting documents uploaded.</p>');
-            }
-
-
-            $("#commentDocumentId").val(docId);
-            $("#newApplication").modal("show");
-        } else {
-            alertify.error(data.message || "Failed to load document");
-        }
-    }, "json");
-
-    // Clear and set loading for history dropdown
-    $('#documentHistory').html('<option>Loading...</option>');
-
-    // Load document history
-    $.post('../function/org/get_doc_history_option.php', { document_id: docId }, function (data) {
-        $('#documentHistory').html(data);
-    });
-});
+            // Load document history
+            $.post('../function/org/get_doc_history_option.php', { document_id: docId }, function (data) {
+                $('#documentHistory').html(data);
+            });
+        });
+        
+		});
 
 
 $("#editorForm").on("submit", function(e) {

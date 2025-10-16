@@ -140,28 +140,39 @@ function toggleSidebar() {
 if (localStorage.getItem('darkMode') === 'enabled') {
     document.documentElement.classList.add('dark-mode');
 }
+// Get the element first
+const userManagement = document.getElementById('settings');
+const userSubMenu = document.getElementById('subsettings');
 
-function updateDateTime() {
-    const now = new Date();
-    const options = {
-        weekday: 'long', year: 'numeric', month: 'long',
-        day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
-    };
-    const formattedDate = now.toLocaleDateString('en-US', options);
-    document.getElementById('currentDateTime').textContent = formattedDate;
-}
-    const userManagement = document.getElementById('settings');
-    const userSubMenu = document.getElementById('subsettings');
+// Only create and run the functions if the element exists
+if (userManagement) {
+    function updateDateTime() {
+        const now = new Date();
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        };
+        const formattedDate = now.toLocaleDateString('en-US', options);
+        const dateTimeEl = document.getElementById('currentDateTime');
+        if (dateTimeEl) dateTimeEl.textContent = formattedDate;
+    }
 
     userManagement.addEventListener('click', () => {
-        userSubMenu.classList.toggle('show');
-    }
-);
-// Initial call
-updateDateTime();
+        if (userSubMenu) userSubMenu.classList.toggle('show');
+    });
 
-// Update every second
-setInterval(updateDateTime, 1000);
+    // Initial call
+    updateDateTime();
+
+    // Update every second
+    setInterval(updateDateTime, 1000);
+}
+
 
 
 // Helper function to get the appropriate Boxicon based on MIME type or file extension
