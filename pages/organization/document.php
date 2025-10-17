@@ -224,6 +224,7 @@
                                     <th>Status</th>
                                     <th>Created By</th>
                                     <th>Date created</th>
+                                    <th>Last updated by</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -243,12 +244,16 @@
                                 $is_president = ($user_info && $user_info['rank_id'] == 5);
 
                                 // ✅ Fetch all documents for this organization
-                                $sql = "
-                                    SELECT d.*, u.first_name AS creator_name
-                                    FROM documents d
-                                    LEFT JOIN users u ON d.user_id = u.user_id
-                                    WHERE d.organization_id = ? AND d.is_archived = 0
-                                ";
+                                $sql = "SELECT 
+                                            d.*, 
+                                            u.first_name AS creator_name,
+                                            u2.first_name AS updater_name
+                                        FROM documents d
+                                        LEFT JOIN users u ON d.user_id = u.user_id
+                                        LEFT JOIN users u2 ON d.updated_by = u2.user_id
+                                        WHERE d.organization_id = ? 
+                                        AND d.is_archived = 0;
+                                    ";
 
                                 $stmt = $conn->prepare($sql);
                                 $stmt->bind_param("i", $current_org_id);
@@ -275,6 +280,7 @@
                                             <td><?= htmlspecialchars($row['status']); ?></td>
                                             <td><?= htmlspecialchars($row['creator_name'] ?? 'Unknown'); ?></td>
                                             <td><?= formatDateTime($row['created_at']); ?></td>
+                                            <td><?= htmlspecialchars($row['updater_name'] ?? '--'); ?></td>
                                             <td>
                                                 <div class="btn-group dropstart">
                                                     <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
