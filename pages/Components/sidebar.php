@@ -330,21 +330,21 @@
 									<span class="hide-on-collapse">Dashboard</span>
 		
 								</a>
-								<!-- <hr class="hr p-0 m-0 ">
+								<hr class="hr p-0 m-0 ">
 		
-								<a href="profile-adviser.php" class="sidebar-link  text-decoration-none px-3 py-1">
+								<a href="manage_organization.php" class="sidebar-link  text-decoration-none px-3 py-1">
 								<i class="fas fa-users me-2"></i>
 									<span class="hide-on-collapse">Organization</span>
 		
-								</a> -->
+								</a>
 								
-								<hr class="hr p-0 m-0 ">
+								<!-- <hr class="hr p-0 m-0 ">
 							
 						
 								<a href="request.php" class="sidebar-link text-decoration-none px-3 py-1">
 									<i class="fa-solid fa-file-lines me-3"></i>
-									<span class="hide-on-collapse">Admin</span>
-								</a>
+									<span class="hide-on-collapse">Request</span>
+								</a> -->
 								
 								<hr class="hr p-0 m-0 ">
 								

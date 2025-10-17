@@ -12,6 +12,8 @@ if (!empty($_SESSION['user_role'])) {
         header('Location: ../pages/dean_pages/dashboard.php');
     } elseif ($role == "fssc") {
         header('Location: ../pages/fssc_pages/dashboard.php');
+    } elseif ($role == "admin") {
+        header('Location: ../pages/admin_pages/dashboard.php');
     } else {
         header("Location: ../pages/logout.php");
     }

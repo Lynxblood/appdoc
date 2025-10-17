@@ -4,13 +4,12 @@ require '../../config/dbcon.php';
 
 // --- Security and Session Check ---
 if(!empty($_SESSION['user_role'])){
-    $adviser_id = $_SESSION['user_id'] ?? 0;
-    // Assuming $allroles is available and the user is authorized for this page
     $excludedValues = ["adviser"];
-    // Simplified security check based on your template's intent
-    // if (in_array($_SESSION['user_role'], $filteredArray)) {
-    //     header('location: ../../config/redirect.php');
-    // }
+    $filteredArray = array_diff($allroles, $excludedValues);
+
+    if (in_array($_SESSION['user_role'], $filteredArray)) {
+        header('location: ../../config/redirect.php');
+    }
 }else{
     header("location: ../logout.php");
 }
