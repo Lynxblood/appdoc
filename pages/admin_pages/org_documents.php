@@ -105,7 +105,6 @@ if (isset($_GET['org_id']) && is_numeric($_GET['org_id'])) {
                                 <th>Submitted By</th>
                                 <th>Created At</th>
                                 <th>Last Updated</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -127,9 +126,6 @@ if (isset($_GET['org_id']) && is_numeric($_GET['org_id'])) {
                                     <td><?php echo htmlspecialchars($doc['first_name'] . ' ' . $doc['last_name']); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($doc['created_at'])); ?></td>
                                     <td><?php echo date('M d, Y h:i A', strtotime($doc['updated_at'])); ?></td>
-                                    <td>
-                                        <a href="#" class="btn btn-sm btn-outline-success">View</a>
-                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

@@ -141,6 +141,7 @@
         header("location: ../logout.php");
     }
     
+    
     $user_id = $_SESSION['user_id'];
     $organization_id_query = $conn->prepare("SELECT organization_id FROM users WHERE user_id = ?");
     $organization_id_query->bind_param("i", $user_id);
@@ -154,19 +155,34 @@
     $documents_query->execute();
     $documents_result = $documents_query->get_result();
 
-    $current_org_id = $_SESSION['organization_id'];
+    $current_org_id = $_SESSION['organization_id'] ?? null;
 
-    $sql = "SELECT DISTINCT e.event_id, e.title, e.description, e.start_date, e.end_date, e.location, e.total_expenses
-    FROM events e
-    INNER JOIN documents d ON e.event_id = d.event_id
-    WHERE e.organization_id = ?
-      AND e.end_date < NOW()
-      AND d.status = 'approved_fssc'
-    ORDER BY e.end_date DESC
-    LIMIT 5
-    ";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $current_org_id);
+    $view_all = isset($_GET['view_all']) && $_GET['view_all'] == '1';
+    $limit_clause = $view_all ? '' : 'LIMIT 2';
+
+    if (empty($current_org_id)) {
+        $sql = "SELECT DISTINCT e.event_id, e.title, e.description, e.start_date, e.end_date, e.location, e.total_expenses
+                FROM events e
+                INNER JOIN documents d ON e.event_id = d.event_id
+                WHERE e.end_date < NOW()
+                AND d.status = 'approved_fssc'
+                ORDER BY e.end_date DESC
+                $limit_clause";
+        $stmt = $conn->prepare($sql);
+    } else {
+        $sql = "SELECT DISTINCT e.event_id, e.title, e.description, e.start_date, e.end_date, e.location, e.total_expenses
+                FROM events e
+                INNER JOIN documents d ON e.event_id = d.event_id
+                WHERE e.organization_id = ?
+                AND e.end_date < NOW()
+                AND d.status = 'approved_fssc'
+                ORDER BY e.end_date DESC
+                $limit_clause";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $current_org_id);
+    }
+
+
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -174,6 +190,7 @@
     while ($row = $result->fetch_assoc()) {
         $past_events[] = $row;
     }
+
     $stmt->close();
 ?>
 <body>
@@ -220,9 +237,14 @@
                             <h3 class="mb-4">
                                 <i class='bx bxs-calendar-check'></i> Latest Past Events
                             </h3>
-                            <a href="all_past_events.php" class="btn btn-sm btn-outline-secondary mb-3">
-                                View All Past Events <i class='bx bx-right-arrow-alt'></i>
-                            </a>
+                            
+                            <?php if (count($past_events) >= 5 && !isset($_GET['view_all'])): ?>
+                                <div class="text-center mt-4">
+                                    <button id="viewAllEventsBtn" class="btn btn-outline-success px-4">
+                                        View All Events
+                                    </button>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -921,6 +943,35 @@ $(document).on("click", ".view-event-details", function() {
 
 
 
+
+document.addEventListener('DOMContentLoaded', () => {
+    const viewAllBtn = document.getElementById('viewAllEventsBtn');
+    if (viewAllBtn) {
+        viewAllBtn.addEventListener('click', function() {
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Loading...';
+            
+            // Reload the same page with ?view_all=1 parameter
+            fetch(window.location.pathname + '?view_all=1')
+                .then(response => response.text())
+                .then(html => {
+                    // Extract only the card section
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newCards = doc.querySelector('.row.row-cols-1');
+                    
+                    if (newCards) {
+                        document.querySelector('.row.row-cols-1').innerHTML = newCards.innerHTML;
+                        viewAllBtn.remove(); // Remove button after showing all
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.textContent = 'Failed to load events';
+                });
+        });
+    }
+});
 
 
     </script>

@@ -17,7 +17,31 @@
     if (!isset($conn)) {
         die("Error: Database connection not available. Check dbcon.php.");
     }
+    
+    // Total Organizations
+    $sql_orgs = "SELECT COUNT(*) AS total_orgs FROM organizations";
+    $result_orgs = $conn->query($sql_orgs);
+    $total_orgs = $result_orgs->fetch_assoc()['total_orgs'];
 
+    // Total Documents
+    $sql_docs = "SELECT COUNT(*) AS total_docs FROM documents";
+    $result_docs = $conn->query($sql_docs);
+    $total_docs = $result_docs->fetch_assoc()['total_docs'];
+
+    // Recent Activities (Limit to 5)
+    $sql_activities = "SELECT
+        o.name AS organization_name,
+        ura.description,
+        ura.created_at
+    FROM
+        org_recent_activities ura
+    JOIN
+        organizations o ON ura.organization_id = o.organization_id
+    ORDER BY
+        ura.created_at DESC
+    LIMIT 10";
+    $result_activities = $conn->query($sql_activities);
+    $recent_activities = $result_activities->fetch_all(MYSQLI_ASSOC);
 
     // Total Pending Approvals (Status: 'pending')
     $query_pending = "SELECT COUNT(*) AS total_pending FROM documents WHERE status = 'endorsed'";
@@ -26,50 +50,11 @@
 
     // Approved This Month (Status: 'approved' this month)
     $query_approved = "SELECT COUNT(*) AS approved_this_month FROM documents
-                       WHERE status = 'pending' 
-                       AND MONTH(updated_at) = MONTH(CURRENT_DATE()) 
-                       AND YEAR(updated_at) = YEAR(CURRENT_DATE())";
+                        WHERE NOT status = 'revision' AND NOT status = 'draft' 
+                        AND MONTH(updated_at) = MONTH(CURRENT_DATE()) 
+                        AND YEAR(updated_at) = YEAR(CURRENT_DATE())";
     $result_approved = $conn->query($query_approved);
     $approved_this_month = $result_approved->fetch_assoc()['approved_this_month'] ?? 0;
-
-    // Revisions Requested (Status: 'revision')
-    $query_revision = "SELECT COUNT(*) AS revisions_requested FROM documents WHERE status = 'revision'";
-    $result_revision = $conn->query($query_revision);
-    $revisions_requested = $result_revision->fetch_assoc()['revisions_requested'] ?? 0;
-
-
-    // 2. PENDING APPROVALS TABLE (Top 10 documents awaiting approval)
-    $query_pending_table = "
-        SELECT 
-            d.document_id, 
-            d.pdf_filename, 
-            o.name AS organization_name, 
-            DATE_FORMAT(d.created_at, '%M %d, %Y') AS submitted_date
-        FROM documents d
-        JOIN organizations o ON d.organization_id = o.organization_id
-        WHERE d.status = 'endorsed'
-        ORDER BY d.created_at ASC
-        LIMIT 10;
-    ";
-    $result_pending_table = $conn->query($query_pending_table);
-
-    // 3. RECENT ACTIVITY (Last 5 documents acted on - using document_history)
-    $query_recent_activity = "
-        SELECT 
-            d.document_id, 
-            d.pdf_filename, 
-            dh.to_status AS action, 
-            u.first_name, 
-            u.last_name,
-            DATE_FORMAT(dh.timestamp, '%b %d %I:%i %p') AS action_time
-        FROM document_history dh
-        JOIN documents d ON dh.document_id = d.document_id
-        JOIN users u ON dh.modified_by_user_id = u.user_id
-        WHERE u.user_id = $admin_id -- Filter for actions taken by the current adviser
-        ORDER BY dh.timestamp DESC
-        LIMIT 5;
-    ";
-    $result_recent_activity = $conn->query($query_recent_activity);
 
 
     // 4. NOTIFICATIONS (Last 5 notifications specific to the adviser)
@@ -173,15 +158,15 @@
                                         <div class="card-body">
                                             <div class="row no-gutters align-items-center">
                                                 <div class="col mr-2">
-                                                    <div class="text-xs font-weight-bold text-pending text-uppercase mb-1">
-                                                        Total Pending
+                                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                        Total Organizations
                                                     </div>
                                                     <div class="h5 mb-0 font-weight-bold text-gray-800 card-number">
-                                                        <?= $total_pending; ?>
+                                                        <?= $total_orgs; ?>
                                                     </div>
                                                 </div>
                                                 <div class="col-auto">
-                                                    <i class="fas fa-hourglass-half fa-2x text-pending"></i>
+                                                    <i class="fas fa-people-group fa-2x text-info"></i>
                                                 </div>
                                             </div>
                                         </div>
@@ -192,15 +177,15 @@
                                         <div class="card-body">
                                             <div class="row no-gutters align-items-center">
                                                 <div class="col mr-2">
-                                                    <div class="text-xs font-weight-bold text-approved text-uppercase mb-1">
-                                                        Approved This Month
+                                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                        Total Documents
                                                     </div>
                                                     <div class="h5 mb-0 font-weight-bold text-gray-800 card-number">
-                                                        <?= $approved_this_month; ?>
+                                                        <?= $total_docs; ?>
                                                     </div>
                                                 </div>
                                                 <div class="col-auto">
-                                                    <i class="fas fa-check-circle fa-2x text-approved"></i>
+                                                    <i class="fas fa-file fa-2x text-warning"></i>
                                                 </div>
                                             </div>
                                         </div>
@@ -211,15 +196,15 @@
                                         <div class="card-body">
                                             <div class="row no-gutters align-items-center">
                                                 <div class="col mr-2">
-                                                    <div class="text-xs font-weight-bold text-revision text-uppercase mb-1">
-                                                        Revisions Requested
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Approved Documents
                                                     </div>
                                                     <div class="h5 mb-0 font-weight-bold text-gray-800 card-number">
-                                                        <?= $revisions_requested; ?>
+                                                        <?= $approved_this_month; ?>
                                                     </div>
                                                 </div>
                                                 <div class="col-auto">
-                                                    <i class="fas fa-exclamation-triangle fa-2x text-revision"></i>
+                                                    <i class="fas fa-check-circle fa-2x text-primary"></i>
                                                 </div>
                                             </div>
                                         </div>
@@ -230,59 +215,23 @@
 
                         <div class="col-12 mb-4">
                             <div class="panel">
-                                <h5 class="mb-3 text-pending">Pending Approvals</h5>
-                                <p class="text-muted">Table of documents awaiting adviser approval.</p>
-                                <div class="table-responsive">
-                                    <table id="pendingDocumentsTable" class="table table-striped table-hover" style="width:100%">
-                                        <thead>
-                                            <tr>
-                                                <th>Document Title</th>
-                                                <th>Organization</th>
-                                                <th>Submitted Date</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php if ($result_pending_table->num_rows > 0): ?>
-                                                <?php while ($doc = $result_pending_table->fetch_assoc()): ?>
-                                                    <tr>
-                                                        <td><?= htmlspecialchars($doc['pdf_filename']); ?></td>
-                                                        <td><?= htmlspecialchars($doc['organization_name']); ?></td>
-                                                        <td><?= htmlspecialchars($doc['submitted_date']); ?></td>
-                                                        <td>
-                                                            <a href="../function/admin/view.php?id=<?= $doc['document_id']; ?>" class="btn btn-sm btn-primary">Review</a>
-                                                        </td>
-                                                    </tr>
-                                                <?php endwhile; ?>
-                                            <?php endif; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 mb-4">
-                            <div class="panel">
-                                <h5 class="mb-3">Recent Activity (Last 5 Actions)</h5>
-                                <div class="list-group list-group-flush">
-                                    <?php if ($result_recent_activity->num_rows > 0): ?>
-                                        <?php while ($activity = $result_recent_activity->fetch_assoc()): ?>
-                                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                                <div class="flex-grow-1">
-                                                    <p class="mb-1">
-                                                        You "<?= htmlspecialchars($activity['action']); ?>" the document: "<?= htmlspecialchars($activity['pdf_filename']); ?>"
-                                                    </p>
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-clock me-1"></i> <?= htmlspecialchars($activity['action_time']); ?>
-                                                    </small>
+                                <h5 class="mb-3">Recent Activity</h5>
+                                
+                                <ul class="list-group list-group-flush">
+                                    <?php if (count($recent_activities) > 0): ?>
+                                        <?php foreach ($recent_activities as $activity): ?>
+                                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                <div class="ms-2 me-auto">
+                                                    <div class="fw-bold"><?php echo htmlspecialchars($activity['organization_name']); ?></div>
+                                                    <?php echo htmlspecialchars($activity['description']); ?>
                                                 </div>
-                                                <i class="fas fa-history text-info"></i>
-                                            </div>
-                                        <?php endwhile; ?>
+                                                <span class="badge bg-secondary rounded-pill"><?php echo date('M d, Y H:i', strtotime($activity['created_at'])); ?></span>
+                                            </li>
+                                        <?php endforeach; ?>
                                     <?php else: ?>
-                                        <p class="text-center text-muted mt-3">No recent actions recorded.</p>
+                                        <li class="list-group-item">No recent activity recorded.</li>
                                     <?php endif; ?>
-                                </div>
+                                </ul>
                             </div>
                         </div>
 

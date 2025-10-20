@@ -159,7 +159,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row d-none">
                 <div class="col-lg-6 settings-card">
                     <div class="panel">
                         <div class="d-flex justify-content-between align-items-center">
